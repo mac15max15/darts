@@ -35,3 +35,5 @@ def get_sectors():
         sectors.append(Sector(theta_min, theta_max, TRIP_INNER, TRIP_OUTER, val * 3))
         sectors.append(Sector(theta_min, theta_max, TRIP_OUTER, DOUB_INNER, val))
         sectors.append(Sector(theta_min, theta_max, DOUB_INNER, DOUB_OUTER, val * 2))
+
+    return sectors
