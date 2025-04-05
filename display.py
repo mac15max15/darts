@@ -16,7 +16,7 @@ def main():
 
 def generate_dartboard_plot():
     dim = DOUB_OUTER*2*SCALE_FACTOR
-    fig, ax = plt.subplots(1, 1, figsize=(dim, dim))
+    fig, ax = plt.subplots(1, 1, figsize=(dim+PAD_WIDTH, dim+PAD_WIDTH))
 
     ax.set_xlim((-(SCALE_FACTOR*DOUB_OUTER+PAD_WIDTH), SCALE_FACTOR*DOUB_OUTER+PAD_WIDTH))
     ax.set_ylim((-(SCALE_FACTOR * DOUB_OUTER + PAD_WIDTH), SCALE_FACTOR * DOUB_OUTER + PAD_WIDTH))
