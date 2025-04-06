@@ -11,7 +11,12 @@ sectors = get_sectors()
 
 
 def main():
-    find_best_multinormal_center(26.9, 150, generate_heatmap=True, disp_pct=True)
+    max_pt = find_best_multinormal_center_hopping(20)
+    print(max_pt)
+    fig, ax = generate_dartboard_plot()
+    ax.scatter(max_pt.x[0]*SCALE_FACTOR, max_pt.x[1]*SCALE_FACTOR)
+    plt.show()
+    #find_best_multinormal_center(26.9, 150, generate_heatmap=True, disp_pct=True)
 
     '''
     df = pd.DataFrame(columns=['sigma', 'x', 'y', 'ev'])
@@ -25,8 +30,15 @@ def main():
             df.to_csv(f'results/test{int(time.time())}.csv')
     '''
 
+def find_best_multinormal_center_hopping(stdev):
+    return spi.optimize.basinhopping(
+        lambda x: -calculate_dist_ev(
+            generate_symmetric_distribution(x[0], x[1], 5)),
+        x0=np.array([0, 0]),
+        stepsize=DOUB_OUTER
+    ).x
 
-def find_best_multinormal_center(stdev, pts=100, generate_heatmap=False, disp_pct=False):
+def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp_pct=False):
     xs = np.linspace(-DOUB_OUTER, DOUB_OUTER, pts)
     ys = np.linspace(-DOUB_OUTER, DOUB_OUTER, pts)
 
@@ -38,7 +50,7 @@ def find_best_multinormal_center(stdev, pts=100, generate_heatmap=False, disp_pc
         if disp_pct:
             print(f'{100 * i / pts:.2f}%')
         for j, y in enumerate(ys):
-            dist = spi.stats.multivariate_normal((x, y), get_covariance_mat(stdev))
+            dist = generate_symmetric_distribution(x, y, stdev)
             results[i][j] = calculate_dist_ev(dist)
 
             if results[i][j] > max_ev:
@@ -55,7 +67,7 @@ def find_best_multinormal_center(stdev, pts=100, generate_heatmap=False, disp_pc
     return max_ev_loc, max_ev
 
 
-def calculate_dist_ev(dist):
+def calculate_dist_ev(dist, x=None, y=None, stdev=None):
     """
     Calculate the expected score from a dart thrown with a given random distribution
     :param dist: the distribution of where the dart will land
@@ -67,6 +79,7 @@ def calculate_dist_ev(dist):
         ev += calculate_sector_ev(sec, dist)
 
     return ev
+
 
 
 def calculate_sector_ev(sec: Sector, dist):
@@ -88,6 +101,10 @@ def calculate_sector_ev(sec: Sector, dist):
         lambda r, theta: dist.pdf((r * np.cos(theta), r * np.sin(theta))) * sec.val * r,
         ranges=[(sec.r_min, sec.r_max), (sec.theta_min, sec.theta_max)]
     )[0]
+
+
+def generate_symmetric_distribution(x, y, stdev):
+    return spi.stats.multivariate_normal((x, y), get_covariance_mat(stdev))
 
 
 def get_covariance_mat(stdev):

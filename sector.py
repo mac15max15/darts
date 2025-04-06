@@ -13,6 +13,8 @@ DOUB_OUTER = 170
 
 SECTOR_VALUES = [6, 13, 4, 18, 1, 20, 5, 12, 9, 14, 11, 8, 16, 7, 19, 3, 17, 2, 15, 10]
 
+
+
 @dataclass
 class Sector:
     theta_min: float
@@ -20,6 +22,16 @@ class Sector:
     r_min: float
     r_max: float
     val: int
+
+    def get_sector_approx_max(self, dist, n):
+        pts = np.meshgrid(
+            np.linspace(self.r_min, self.r_max, n),
+            np.linspace(self.theta_min, self.theta_max, n)
+        ).flatten()
+
+        print(pts)
+
+
 
 def get_sectors():
     # inner and outer bulls
