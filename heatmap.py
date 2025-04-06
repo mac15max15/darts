@@ -3,14 +3,16 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.colors as colors
 
+
 import display
 from display import *
+from constants import *
 
 fig, ax = display.generate_dartboard_plot()
-arr = np.load('heatmap_data/sig26.9_1743875005.npy')
+arr = np.load('heatmap_data/sig10_1743922998.npy')
 
-xs = np.linspace(-DOUB_OUTER, DOUB_OUTER, len(arr))
-ys = np.linspace(-DOUB_OUTER, DOUB_OUTER, len(arr))
+xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
+ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
 
 ax.pcolormesh(
     xs * SCALE_FACTOR, ys * SCALE_FACTOR, arr,

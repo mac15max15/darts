@@ -1,19 +1,18 @@
 from dataclasses import dataclass
 import math
 import numpy as np
+from itertools import product
 
-# dartboard dimensions
-WIDTH = 2 * np.pi / 20  # angle covered by each sector
-BULL_INNER = 6.35
-BULL_OUTER = 15.9
-TRIP_INNER = 99
-TRIP_OUTER = 107
-DOUB_INNER = 162
-DOUB_OUTER = 170
-
-SECTOR_VALUES = [6, 13, 4, 18, 1, 20, 5, 12, 9, 14, 11, 8, 16, 7, 19, 3, 17, 2, 15, 10]
+from constants import *
 
 
+
+def ptoc(polar_coords):
+    r = polar_coords[:, 0]
+    theta = polar_coords[:, 1]
+    x = r * np.cos(theta)
+    y = r * np.sin(theta)
+    return np.column_stack((x, y))
 
 @dataclass
 class Sector:
@@ -23,15 +22,28 @@ class Sector:
     r_max: float
     val: int
 
-    def get_sector_approx_max(self, dist, n):
-        pts = np.meshgrid(
-            np.linspace(self.r_min, self.r_max, n),
-            np.linspace(self.theta_min, self.theta_max, n)
-        ).flatten()
+    def get_midpoint(self):
+        r_mean, theta_mean = np.mean([self.r_min, self.r_max]), np.mean([self.theta_min, self.theta_max])
+        return r_mean*np.cos(theta_mean), r_mean*np.sin(theta_mean)
 
-        print(pts)
+    def get_sector_approx_max(self, pdf, n):
+
+        pts = cartesian_product(
+                np.linspace(self.r_min, self.r_max, n),
+                np.linspace(self.theta_min, self.theta_max, n)
+        )
+        return np.max(pdf(ptoc(pts)))
 
 
+
+# stackoverflow.com/questions/11144513/cartesian-product-of-x-and-y-array-points-into-single-array-of-2d-points
+def cartesian_product(*arrays):
+    la = len(arrays)
+    dtype = np.result_type(*arrays)
+    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
+    for i, a in enumerate(np.ix_(*arrays)):
+        arr[...,i] = a
+    return arr.reshape(-1, la)
 
 def get_sectors():
     # inner and outer bulls

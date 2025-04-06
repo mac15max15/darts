@@ -5,10 +5,6 @@ import numpy as np
 
 from sector import *
 
-MM_PER_INCH = 25.4
-SCALE_FACTOR = 0.4 / MM_PER_INCH
-PAD_WIDTH = 0.1
-
 def main():
     fig, ax = generate_dartboard_plot()
     plt.show()
@@ -20,11 +16,11 @@ def generate_dartboard_plot() -> tuple[plt.Figure, plt.Axes]:
     :return: the figure and the axis
     """
 
-    dim = DOUB_OUTER*2*SCALE_FACTOR
-    fig, ax = plt.subplots(1, 1, figsize=(dim+PAD_WIDTH, dim+PAD_WIDTH))
+    dim = DOUB_OUTER*2*SCALE_FACTOR+PAD_WIDTH
+    fig, ax = plt.subplots(1, 1, figsize=(dim, dim))
 
-    ax.set_xlim((-(SCALE_FACTOR*DOUB_OUTER+PAD_WIDTH), SCALE_FACTOR*DOUB_OUTER+PAD_WIDTH))
-    ax.set_ylim((-(SCALE_FACTOR * DOUB_OUTER + PAD_WIDTH), SCALE_FACTOR * DOUB_OUTER + PAD_WIDTH))
+    ax.set_xlim((-(DOUB_OUTER+HEATMAP_PAD_MM)*SCALE_FACTOR, (DOUB_OUTER+HEATMAP_PAD_MM)*SCALE_FACTOR))
+    ax.set_ylim((-(DOUB_OUTER+HEATMAP_PAD_MM)*SCALE_FACTOR, (DOUB_OUTER+HEATMAP_PAD_MM)*SCALE_FACTOR))
     ax.set_axis_off()
 
     # rings

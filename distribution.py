@@ -6,41 +6,31 @@ import time
 
 from sector import *
 from display import *
+from constants import *
+
 
 sectors = get_sectors()
 
 
 def main():
-    max_pt = find_best_multinormal_center_hopping(20)
+    max_pt = find_best_multinormal_center_bf(10, 150, generate_heatmap=True, disp_pct=True)
     print(max_pt)
-    fig, ax = generate_dartboard_plot()
-    ax.scatter(max_pt.x[0]*SCALE_FACTOR, max_pt.x[1]*SCALE_FACTOR)
     plt.show()
-    #find_best_multinormal_center(26.9, 150, generate_heatmap=True, disp_pct=True)
 
-    '''
-    df = pd.DataFrame(columns=['sigma', 'x', 'y', 'ev'])
-
-    for sigma in range(1, 30):
-        print(sigma)
-        loc, ev = find_best_multinormal_center(sigma, 100)
-        df.loc[len(df)] = {'sigma': sigma, 'x': loc[0], 'y': loc[1], 'ev': ev}
-
-        if sigma % 5 == 0:
-            df.to_csv(f'results/test{int(time.time())}.csv')
-    '''
 
 def find_best_multinormal_center_hopping(stdev):
     return spi.optimize.basinhopping(
         lambda x: -calculate_dist_ev(
-            generate_symmetric_distribution(x[0], x[1], 5)),
+            generate_symmetric_distribution(x[0], x[1], stdev)),
         x0=np.array([0, 0]),
         stepsize=DOUB_OUTER
     ).x
 
 def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp_pct=False):
-    xs = np.linspace(-DOUB_OUTER, DOUB_OUTER, pts)
-    ys = np.linspace(-DOUB_OUTER, DOUB_OUTER, pts)
+
+    xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
+    ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
+
 
     results = np.ndarray((pts, pts))
     max_ev = 0
@@ -81,7 +71,6 @@ def calculate_dist_ev(dist, x=None, y=None, stdev=None):
     return ev
 
 
-
 def calculate_sector_ev(sec: Sector, dist):
     """
     Given a random distribution and a sector of the dartboard. Integrate over
@@ -90,11 +79,8 @@ def calculate_sector_ev(sec: Sector, dist):
     :param dist: The distribution to integrate over
     :return: The expected value contributed by sec
     """
-    if np.mean([dist.pdf((sec.r_min * np.cos(sec.theta_min), sec.r_min * np.sin(sec.theta_min))),
-                dist.pdf((sec.r_min * np.cos(sec.theta_max), sec.r_min * np.sin(sec.theta_max))),
-                dist.pdf((sec.r_max * np.cos(sec.theta_min), sec.r_max * np.sin(sec.theta_min))),
-                dist.pdf((sec.r_max * np.cos(sec.theta_max), sec.r_max * np.sin(sec.theta_max)))]) < 1e-25:
 
+    if dist.pdf(sec.get_midpoint()) < 1e-20:
         return 0
 
     return spi.integrate.nquad(
