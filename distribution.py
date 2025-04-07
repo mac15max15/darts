@@ -13,19 +13,28 @@ sectors = get_sectors()
 
 
 def main():
-    sigmas = np.linspace(1, 100, 100)
+    sigmas = np.linspace(49, 100, 52)
     t = int(time.time())
 
     for sigma in sigmas:
-        res, val, grid, jout = find_best_multinormal_center_numpy_bf(sigma, 3)
-        with open(f'results/res{t}.txt', 'a') as res_file:
+        res, val, grid, jout = find_best_multinormal_center_numpy_bf(sigma, 25)
+        with open(f'results/res1743995606.txt', 'a') as res_file:
             res_file.write(f'{sigma},{res[0]},{res[1]},{-val}\n')
         print(sigma)
 
 
 
-
 def find_best_multinormal_center_numpy_bf(stdev, n):
+    """
+    Find the point (x, y) that maximizes the expected score for a dart thrown with
+    a symmetrical normal distribution centered on (x, y) and with standard deviation
+    stdev.
+
+    This method uses SciPy's brute force global optimizer which creates an n by n
+    grid of points and evaluates the function (ie the expected value of the distribution)
+    at each point. After the brute force, it then uses a gradient-based local optimizer (spi.optimize.fmin)
+    to refine the point.
+    """
     return spi.optimize.brute(
         lambda x: -calculate_dist_ev(
             generate_symmetric_distribution(x[0], x[1], stdev)),
@@ -35,15 +44,33 @@ def find_best_multinormal_center_numpy_bf(stdev, n):
         full_output=True
     )
 
-
+def find_best_multinormal_center_diffev(stdev):
+    return spi.optimize.shgo(
+        lambda x: -calculate_dist_ev(
+            generate_symmetric_distribution(x[0], x[1], stdev)),
+        bounds=((-DOUB_OUTER, DOUB_OUTER), (-DOUB_OUTER, DOUB_OUTER))
+    ).x
 
 def find_best_multinormal_center_hopping(stdev):
     return spi.optimize.basinhopping(
         lambda x: -calculate_dist_ev(
             generate_symmetric_distribution(x[0], x[1], stdev)),
         x0=np.array([0, 0]),
-        stepsize=DOUB_OUTER
+        niter=20,
+        stepsize=150,
+        T=1,
+        callback= lambda x, f, accept: basin_iter_callback,
+        minimizer_kwargs={'callback': minimizer_callback}
     ).x
+
+def basin_iter_callback(x, f, accept):
+    with open('basin_runs/test0.txt', 'a') as out:
+        out.write(f'Point: {x}, Function Value:{f}, Accepted?: {accept}*\n')
+
+def minimizer_callback(x):
+    with open('basin_runs/test0.txt', 'a') as out:
+        out.write(f'{x}\n')
+
 
 def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp_pct=False):
 

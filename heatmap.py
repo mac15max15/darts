@@ -9,7 +9,7 @@ from display import *
 from constants import *
 
 fig, ax = display.generate_dartboard_plot()
-fname = 'sig40_1743980781'
+fname = 'sig26.9_1743875005'
 arr = np.load(f'heatmap_data/{fname}.npy')
 
 xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
