@@ -13,9 +13,28 @@ sectors = get_sectors()
 
 
 def main():
-    max_pt = find_best_multinormal_center_bf(10, 150, generate_heatmap=True, disp_pct=True)
-    print(max_pt)
-    plt.show()
+    sigmas = np.linspace(1, 100, 100)
+    t = int(time.time())
+
+    for sigma in sigmas:
+        res, val, grid, jout = find_best_multinormal_center_numpy_bf(sigma, 3)
+        with open(f'results/res{t}.txt', 'a') as res_file:
+            res_file.write(f'{sigma},{res[0]},{res[1]},{-val}\n')
+        print(sigma)
+
+
+
+
+def find_best_multinormal_center_numpy_bf(stdev, n):
+    return spi.optimize.brute(
+        lambda x: -calculate_dist_ev(
+            generate_symmetric_distribution(x[0], x[1], stdev)),
+        ranges=((-DOUB_OUTER, DOUB_OUTER), (-DOUB_OUTER, DOUB_OUTER)),
+        Ns=n,
+        finish=spi.optimize.fmin,
+        full_output=True
+    )
+
 
 
 def find_best_multinormal_center_hopping(stdev):
@@ -30,7 +49,6 @@ def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp
 
     xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
     ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
-
 
     results = np.ndarray((pts, pts))
     max_ev = 0
@@ -57,7 +75,7 @@ def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp
     return max_ev_loc, max_ev
 
 
-def calculate_dist_ev(dist, x=None, y=None, stdev=None):
+def calculate_dist_ev(dist):
     """
     Calculate the expected score from a dart thrown with a given random distribution
     :param dist: the distribution of where the dart will land
@@ -80,12 +98,12 @@ def calculate_sector_ev(sec: Sector, dist):
     :return: The expected value contributed by sec
     """
 
-    if dist.pdf(sec.get_midpoint()) < 1e-20:
+    if sec.get_sector_approx_max(dist.pdf, 3) < SECTOR_PDF_IGNORE_THRESHOLD:
         return 0
 
     return spi.integrate.nquad(
         lambda r, theta: dist.pdf((r * np.cos(theta), r * np.sin(theta))) * sec.val * r,
-        ranges=[(sec.r_min, sec.r_max), (sec.theta_min, sec.theta_max)]
+        ranges=[(sec.r_min, sec.r_max), (sec.theta_min, sec.theta_max)],
     )[0]
 
 

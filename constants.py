@@ -19,3 +19,5 @@ SCALE_FACTOR = 0.4 / MM_PER_INCH  # for converting from dartboard dimensions to 
 PAD_WIDTH = 0.1
 
 HEATMAP_PAD_MM = 25
+
+SECTOR_PDF_IGNORE_THRESHOLD = 1e-6
