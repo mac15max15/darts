@@ -3,13 +3,11 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.colors as colors
 
-
-import display
 from display import *
 from constants import *
 
-fig, ax = display.generate_dartboard_plot()
-fname = 'sig26.9_1743875005'
+fig, ax = generate_dartboard_plot()
+fname = 'sig18_pts_10_1744015022'
 arr = np.load(f'heatmap_data/{fname}.npy')
 
 xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))

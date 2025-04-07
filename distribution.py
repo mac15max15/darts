@@ -10,10 +10,10 @@ from constants import *
 
 
 sectors = get_sectors()
-
+of = 'basin_runs/test5s10.txt'
 
 def main():
-    sigmas = np.linspace(49, 100, 52)
+    sigmas = np.linspace(64, 100, 37)
     t = int(time.time())
 
     for sigma in sigmas:
@@ -54,25 +54,29 @@ def find_best_multinormal_center_diffev(stdev):
 def find_best_multinormal_center_hopping(stdev):
     return spi.optimize.basinhopping(
         lambda x: -calculate_dist_ev(
-            generate_symmetric_distribution(x[0], x[1], stdev)),
+            generate_symmetric_distribution(x[0], x[1], stdev)
+        ),
         x0=np.array([0, 0]),
-        niter=20,
         stepsize=150,
         T=1,
-        callback= lambda x, f, accept: basin_iter_callback,
-        minimizer_kwargs={'callback': minimizer_callback}
+        niter_success=5,
+        callback=basin_iter_callback,
+        minimizer_kwargs={
+            'callback': minimizer_callback,
+            'method': 'CG'
+        }
     ).x
 
 def basin_iter_callback(x, f, accept):
-    with open('basin_runs/test0.txt', 'a') as out:
+    with open(of, 'a') as out:
         out.write(f'Point: {x}, Function Value:{f}, Accepted?: {accept}*\n')
 
 def minimizer_callback(x):
-    with open('basin_runs/test0.txt', 'a') as out:
+    with open(of, 'a') as out:
         out.write(f'{x}\n')
 
 
-def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp_pct=False):
+def generate_heatmap_data(stdev, pts=100, disp_pct=False):
 
     xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
     ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, pts)
@@ -92,12 +96,7 @@ def find_best_multinormal_center_bf(stdev, pts=100, generate_heatmap=False, disp
                 max_ev = results[i][j]
                 max_ev_loc = (x, y)
 
-    if generate_heatmap:
-        fig, ax = generate_dartboard_plot()
-        ax.pcolormesh(xs * SCALE_FACTOR, ys * SCALE_FACTOR, results.transpose(), shading='nearest', alpha=0.3)
-        ax.scatter(max_ev_loc[0] * SCALE_FACTOR, max_ev_loc[1] * SCALE_FACTOR, color='r')
-        fig.savefig(f'images/sig{stdev}_{int(time.time())}.png', dpi=800)
-        np.save(f'heatmap_data/sig{stdev}_{int(time.time())}.npy', results.transpose())
+    np.save(f'heatmap_data/sig{stdev}_{pts}pts_{int(time.time())}.npy', results.transpose())
 
     return max_ev_loc, max_ev
 
