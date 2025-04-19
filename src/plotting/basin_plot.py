@@ -1,12 +1,17 @@
 import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import path
-import matplotlib.patches as patches
 
 import display
-from constants import *
+from src.math.constants import *
 
 def parse_file(filename):
+    """
+    Function for parsing the output file from running a basin hopping optimization.
+    Enter at your own risk.
+    .
+    :return: A list of paths, each representing one run of the local optimizer,
+    and a list of flags saying whether the result of each path was accepted
+    by the basin hopping algo.
+    """
     sets = []
     accepted_flags = []
 
@@ -16,11 +21,9 @@ def parse_file(filename):
         for line in file:
             line = line.strip()
             if not line:
-                continue  # skip empty lines
+                continue
 
             if line.endswith('*'):
-                # This line ends the current set
-                parts = line.split()
                 accepted = line[-5] == 'T'
                 accepted_flags.append(accepted)
 
@@ -40,8 +43,7 @@ def parse_file(filename):
 
 
 fig, ax = display.generate_dartboard_plot()
-fname = 'sig10_1743922998'
-arr = np.load(f'heatmap_data/{fname}.npy')
+arr = np.load(f'heatmap_data/high_res_26.9.npy')
 
 xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
 ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
@@ -55,10 +57,10 @@ ax.pcolormesh(
     xs * SCALE_FACTOR, ys * SCALE_FACTOR, arr,
     shading='nearest',
     alpha=0.4,
-    cmap='hot'
+    cmap='viridis'
 )
 
-fn = 'basin_runs/test5s10.txt'
+fn = 'basin_data/test4.txt'
 sets, accepted_flags = parse_file(fn)
 
 
@@ -66,7 +68,7 @@ with open(fn, 'r') as file:
     l = list(map(float, ((file.readlines()[-1])[1:-1]).split()))
     ax.scatter(l[0]*SCALE_FACTOR,l[1]*SCALE_FACTOR, s=10, color='darkgreen', marker='o', linewidths=1.5)
 
-ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
+ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='c', marker='x', linewidths=1.5)
 
 
 def cm(success):
@@ -76,8 +78,6 @@ def cm(success):
         return 'r'
 
 
-
-# Debug print (optional)
 for i, s in enumerate(sets):
 
     xs = SCALE_FACTOR*np.array(s[0,:])

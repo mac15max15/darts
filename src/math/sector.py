@@ -1,11 +1,7 @@
 from dataclasses import dataclass
 import math
-import numpy as np
-from itertools import product
 
-from constants import *
-
-
+from src.math.constants import *
 
 @dataclass
 class Sector:
@@ -27,7 +23,8 @@ class Sector:
         """
         Given a pdf, create an evenly spaced (at least in polar coordinates) n by
         n grid of points over this sector and evaluate the pdf at each point, then
-        return the maximum value.
+        return the maximum value. This is used to optimize integration by ignoring
+        sections with low pdf values.
         """
 
         pts = cartesian_product(
@@ -79,3 +76,32 @@ def get_sectors():
         sectors.append(Sector(theta_min, theta_max, DOUB_INNER, DOUB_OUTER, val * 2))
 
     return sectors
+
+def get_score(x, y):
+    """
+    Function that takes in an x and y coordinate and returns the score of a
+    dart at that location. Used by the convolution methods.
+    """
+
+    SECTORS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17,
+               3, 19, 7, 16, 8, 11, 14, 9, 12, 5]
+
+    r = math.hypot(x, y)
+    theta = math.degrees(math.atan2(y, x))
+
+    angle = (99 - theta) % 360
+    sector_index = int(angle // 18)
+    base_score = SECTORS[sector_index]
+
+    if r <= BULL_INNER:
+        return 50
+    elif r <= BULL_OUTER:
+        return 25
+    elif TRIP_INNER <= r <= TRIP_OUTER:
+        return base_score * 3
+    elif DOUB_INNER <= r <= DOUB_OUTER:
+        return base_score * 2
+    elif r <= DOUB_OUTER:
+        return base_score
+    else:
+        return 0

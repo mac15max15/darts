@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import *
 from matplotlib.path import Path
-import numpy as np
 
-from sector import *
+from src.math.sector import *
 
 def main():
     fig, ax = generate_dartboard_plot()
