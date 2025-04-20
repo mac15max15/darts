@@ -18,8 +18,6 @@ def generate_dartboard_plot() -> tuple[plt.Figure, plt.Axes]:
     dim = (DOUB_OUTER+HEATMAP_PAD_MM)*SCALE_FACTOR*2
     fig, ax = plt.subplots(1, 1, figsize=(dim, dim))
 
-    # ax.set_xlim((-dim, dim))
-    # ax.set_ylim((-dim, dim))
     ax.set_axis_off()
 
     # rings
@@ -47,6 +45,8 @@ def generate_dartboard_plot() -> tuple[plt.Figure, plt.Axes]:
             verticalalignment='center',
             rotation=(ang*180/np.pi)-90
         )
+
+
 
     return fig, ax
 

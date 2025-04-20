@@ -1,5 +1,8 @@
 from src.math.distribution import *
+from src.math.constants import *
+
 import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
     fig, ax = generate_dartboard_plot()
@@ -11,20 +14,35 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
     print(xs[max_pt[0]])
     print(ys[max_pt[1]])
 
-    ax.pcolormesh(
+    heatmap = ax.pcolormesh(
         xs * SCALE_FACTOR, ys * SCALE_FACTOR, arr,
         shading='nearest',
         alpha=0.4,
         cmap='gist_heat'
     )
-    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
 
+
+
+
+    cax = inset_axes(
+        ax,
+        width="3%",
+        height="100%",
+        loc='lower left',
+        borderpad=0,
+        bbox_to_anchor=(1.02, 0., 1, 1),
+        bbox_transform=ax.transAxes
+    )
+
+    fig.colorbar(heatmap, cax=cax, label='Expected Score')
+
+    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
     if save_fig:
         if not fname:
             fname = int(time.time())
-        fig.savefig(f'images/{fname}.png', dpi=DPI)
+        fig.savefig(f'images/{fname}', dpi=800)
     plt.show()
 
 if __name__ == '__main__':
     arr = np.load('/Users/maxcaragozian/Desktop/MATH 305/Darts/heatmap_data/high_res_26.9.npy')
-    plot_heatmap(arr, fname='cividistest.png')
+    plot_heatmap(arr, fname='gistheat.png', save_fig=False)
