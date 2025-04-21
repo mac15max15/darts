@@ -105,3 +105,7 @@ def get_score(x, y):
         return base_score
     else:
         return 0
+
+if __name__ == "__main__":
+    s = get_sectors()
+    print(len(s))

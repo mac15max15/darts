@@ -4,12 +4,17 @@ from src.math.constants import *
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
+
 def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
+    """
+    Plot a dartboard heatmap from a numpy array
+    """
     fig, ax = generate_dartboard_plot()
 
     xs = np.linspace(-DOUB_OUTER-padding, DOUB_OUTER+padding, len(arr))
     ys = np.linspace(-DOUB_OUTER-padding, DOUB_OUTER+padding, len(arr))
 
+    # extract mu*
     max_pt = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F')
     print(xs[max_pt[0]])
     print(ys[max_pt[1]])
@@ -20,9 +25,6 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
         alpha=0.4,
         cmap='gist_heat'
     )
-
-
-
 
     cax = inset_axes(
         ax,
@@ -36,7 +38,7 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
 
     fig.colorbar(heatmap, cax=cax, label='Expected Score')
 
-    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
+    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR, ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
     if save_fig:
         if not fname:
             fname = int(time.time())

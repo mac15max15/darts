@@ -17,6 +17,28 @@
 \endgroup
 
 \datalist[entry]{nty/global//global/global}
+  \entry{basin}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=CTS}{%
+         family={Community},
+         familyi={C\bibinitperiod},
+         given={The\bibnamedelima Scipy},
+         giveni={T\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CTS1}
+    \strng{fullhash}{CTS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{title}{scipy.optimize.basinhopping}
+    \verb{url}
+    \verb https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.b
+    \verb asinhopping.html#scipy.optimize.basinhopping
+    \endverb
+  \endentry
+
   \entry{stat}{article}{}
     \name{author}{2}{}{%
       {{hash=RTAP}{%

@@ -11,5 +11,9 @@ ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr)
 
 X, Y = np.meshgrid(xs, ys)
 
-ax.plot_surface(X, Y, arr, cmap='coolwarm')
+ax.set_xlabel('mu_x')
+ax.set_ylabel('mu_y')
+ax.set_zlabel('Expected Score')
+
+ax.plot_surface(X, Y, -arr, cmap='coolwarm')
 plt.show()

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.12)  20 APR 2025 19:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.12)  21 APR 2025 00:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -436,20 +436,20 @@ Package: blx-case-expl3 2023/03/05 v3.19 expl3 case changing code for biblatex
 (./template_Article.aux)
 \openout1 = `template_Article.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
 
 (/usr/local/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -491,15 +491,15 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'template_Article.bbl' found.
 
 (./template_Article.bbl)
-Package biblatex Info: Reference section=0 on input line 16.
-Package biblatex Info: Reference segment=0 on input line 16.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 18.
+Package biblatex Info: Reference section=0 on input line 19.
+Package biblatex Info: Reference segment=0 on input line 19.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 21.
 
 
 (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 18.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 21.
 
 
 (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -508,42 +508,57 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <../images/dartboard_diagram.png, id=1, 602.25pt x 447.6725pt>
 File: ../images/dartboard_diagram.png Graphic file (type png)
 <use ../images/dartboard_diagram.png>
-Package pdftex.def Info: ../images/dartboard_diagram.png  used on input line 34
+Package pdftex.def Info: ../images/dartboard_diagram.png  used on input line 37
 .
-(pdftex.def)             Requested size: 345.0pt x 256.46019pt.
+(pdftex.def)             Requested size: 276.00105pt x 205.16678pt.
  [1
 
-{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2 <../
-images/dartboard_diagram.png>]
-<../images/gist_hear.png, id=21, 443.7378pt x 443.7378pt>
+{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+<../images/gist_hear.png, id=17, 443.7378pt x 443.7378pt>
 File: ../images/gist_hear.png Graphic file (type png)
 <use ../images/gist_hear.png>
 Package pdftex.def Info: ../images/gist_hear.png  used on input line 58.
-(pdftex.def)             Requested size: 345.0pt x 345.01044pt.
+(pdftex.def)             Requested size: 276.00105pt x 276.00835pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[2 <../images/dartboard_diagram.png>] [3 <../images/gist_hear.png>]
+<../images/basin_s10.png, id=30, 443.7378pt x 443.7378pt>
+File: ../images/basin_s10.png Graphic file (type png)
+<use ../images/basin_s10.png>
+Package pdftex.def Info: ../images/basin_s10.png  used on input line 85.
+(pdftex.def)             Requested size: 276.00105pt x 276.00835pt.
 
-Overfull \hbox (22.36815pt too wide) in paragraph at lines 70--70
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Overfull \hbox (32.55247pt too wide) in paragraph at lines 106--106
+\OT1/cmtt/m/n/10 scipy . org / doc / scipy / reference / generated / scipy . op
+timize . basinhopping .
+ []
+
+
+Overfull \hbox (22.36815pt too wide) in paragraph at lines 106--106
 []\OT1/cmr/m/n/10 Tijmen Stam. \OT1/cmr/m/it/10 Dart-board di-a-gram.svg\OT1/cm
 r/m/n/10 . 2014. \OT1/cmr/m/sc/10 url\OT1/cmr/m/n/10 : $\OT1/cmtt/m/n/10 https 
 : / / commons . wikimedia .
  []
 
-[3] [4 <../images/gist_hear.png>] (./template_Article.aux)
+[4] [5 <../images/basin_s10.png>] (./template_Article.aux)
 Package logreq Info: Writing requests to 'template_Article.run.xml'.
 \openout1 = `template_Article.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 10971 strings out of 476025
- 204527 string characters out of 5790017
- 1857388 words of memory out of 5000000
- 31303 multiletter control sequences out of 15000+600000
- 522822 words of font info for 73 fonts, out of 8000000 for 9000
+ 10981 strings out of 476025
+ 204849 string characters out of 5790017
+ 1859388 words of memory out of 5000000
+ 31314 multiletter control sequences out of 15000+600000
+ 522203 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,6n,68p,1887b,1395s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 63i,7n,68p,1887b,1395s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb>
@@ -559,10 +574,10 @@ ive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
 ve/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive
 /2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/
 2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on template_Article.pdf (4 pages, 1565653 bytes).
+Output written on template_Article.pdf (5 pages, 3058652 bytes).
 PDF statistics:
- 97 PDF objects out of 1000 (max. 8388607)
- 56 compressed objects within 1 object stream
+ 102 PDF objects out of 1000 (max. 8388607)
+ 58 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

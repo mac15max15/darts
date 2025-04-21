@@ -13,6 +13,9 @@
 \title{Darts}
 \author{Max Caragozian}
 
+
+\newcommand{\mustar}{\ensuremath{\mu^* }}
+
 \begin{document}
 
 \maketitle
@@ -31,33 +34,66 @@ At the outset of this project, my aim was to replicate some of the results of ``
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{../images/dartboard_diagram.png}
+	\includegraphics[width=0.8\textwidth]{../images/dartboard_diagram.png}
 	\caption{Standard dartboard with point values \cite{diag}}
 	\label{fig:diag}
 \end{figure}
 
-\section{Brute Force}
-Before trying to find $\mu^*(\sigma)$, I wrote code that would find the expected score for someone throwing a dart with a given random distribution. We define a \textit{sector} as a continguous area of the dartboard with a single point value. Examples are the triple 20, the double bullseye, or the portion of single 19 that lies between the outer bullseye ring and the inner triple ring. We define $S$ as the set of all sectors and $X$ as a distribution with PDF $f_x$. To find the expected score of a distribution we compute:
+\section{Integration Brute Force}
+Before trying to find $\mu^*(\sigma)$, I wrote code that would find the expected score for someone throwing a dart with a given random distribution. We define a \textit{sector} as a continguous area of the dartboard with a single point value. Examples are the triple 20, the double bullseye, or the portion of single 19 that lies between the outer bullseye ring and the inner triple ring. Let $S$ be the set of all sectors and $X$ be a distribution with PDF $f_x$. To find the expected score of a distribution we compute:
 
 
- 
 
 \begin{equation}
 	E[score(X)] = \sum_{s \in S} \iint_{s} score_s \cdot  f_x(x, y)  dxdy.
 	\label{eq:int}
 \end{equation}
 
-
-
 I used SciPy's \textit{nquad} function to perform the integration. Originally, I used the \textit{dblquad} method, which is specific to double integral, but I ran into a rounding issues when $f_x$ was very small. The \textit{nquad} function allows finer control and fixed the issue. 
 
-With the code implementation of Equation \ref{eq:int}, I could fix $\sigma$ and calculate the expected score of normal distributions centered at many different points across the dartboard. I could then plot the results as a heat map.
+With the code implementation of Equation \ref{eq:int}, I could fix $\sigma$ and calculate the expected score for normal distributions centered at many different points $\mu$ across the dartboard, returning both the approximate global maximum ($\mu^*$) and data that could be plotted as a heatmap.
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth]{../images/gist_hear.png}
-	\caption{Heatmap for $\sigma = 26.9$. The green \textbf{+} is the location of  $\mathbf{\mu^*}$}
+	\includegraphics[width=0.8\textwidth]{../images/gist_hear.png}
+	\caption{Heatmap for $\sigma = 26.9$. The green \textbf{+} is the location of  \mustar}
+	\label{fig:basicheatmap}
 \end{figure}
+
+For each pixel in the heat map I computed 82 double integrals: one for each sector of the dartboard. This was painfully slow, and I spent a lot of time trying to optimize the code by testing the value of the PDF at certain values across the sector so I could skip integrating over sectors that would contribute very little to the final expected score. After a lot of time tinkering with the threshhold for rejecting a sector and how to distribute test points, etc., I came to the conclusion it was easier just to compute every integral. The speedup from my optimization was minimal, and I couldnt escape the fear that by skipping certain integrals I might materially affect the final calculation.
+
+STUFF ABOUT TIMKNG
+
+\section{Global Optimization Algorithms}
+
+I looked for faster ways to compute  \mustar for a fixed $\sigma$. We can think about the problem as maximizing the function
+\begin{equation}
+	F(\mu \vert \sigma)  = E[score(\mathcal{N}(\mu, \sigma^2))]
+\end{equation}
+over all points  on the dartboard $\mu$. Because optimization algorithms by convention minimize functilns rather than maximizing them, we end up computing 
+\begin{equation}
+	\min(-F(\mu \vert \sigma)).
+\end{equation}
+
+SciPy has bindings for several different global minimization algorithms. I ended up settling on an stochastic algorithm called \textit{basin-hopping}. The basin-hopping algorithm takes in an initial guess, and then modifies it by a step of a random size in a random direction. After landing at new point, the algorithm employs a local minimization technique to move ``downhill'' to a local minimum. It then compares the new local minimum with the most recent point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower values being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
+
+We should note that basin-hopping is not guaranteed to find the global minimum. If the random jumps never find the right ``basin'', the algorithm will return the wrong answer.
+
+SciPy allows the programmer to pass callbacks to both the global and local minimizer, meaning one can record the progress of the algorithm. I wrote code to write the progress to a file and then plot the data over a heatmap such as that in Figure \ref{fig:basicheatmap}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/basin_s10.png}
+	\caption{Each run of the local optimizer for a basin-hopping run to find $\mustar(\sigma=10mm)$.  Points that were \textit{accepted} by the algorithm are green while those that were \textit{rejected} are red. The green + is the true location of \mustar.}
+	\label{fig:basin}
+\end{figure}
+
+While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The run in Figure \ref{fig:basin} is an example of a time when basin-hopping failed to find the true global minimum. The other problem is that basin-stopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 56 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
+
+\section{Don't Let 10 Minutes of Reading Save You From 10 Hours of Coding}
+
+
+
+
 
 
 

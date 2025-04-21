@@ -12,18 +12,22 @@ of = 'fasdfas.txt'
 
 
 def main():
-    sigmas = np.arange(16, 17, .05)
-    df = pd.DataFrame(
-        index=sigmas,
-        columns=['x', 'y', 'ev']
-    )
+    # sigmas = np.arange(16, 17, .05)
+    # df = pd.DataFrame(
+    #     index=sigmas,
+    #     columns=['x', 'y', 'ev']
+    # )
+    #
+    # for sigma in sigmas:
+    #     center, ev = find_best_multinormal_center_convolve(sigma, 500)
+    #     df.loc[sigma] = {'x': center[0], 'y': center[1], 'ev': ev}
+    #     print(sigma)
+    #
+    # df.to_csv(f'close_run.csv')
 
-    for sigma in sigmas:
-        center, ev = find_best_multinormal_center_convolve(sigma, 500)
-        df.loc[sigma] = {'x': center[0], 'y': center[1], 'ev': ev}
-        print(sigma)
 
-    df.to_csv(f'close_run.csv')
+    arr = generate_heatmap_data_convolve(10, 300)
+    np.save('../../heatmap_data/s10highres.npy', arr)
 
 
 
