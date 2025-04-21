@@ -82,12 +82,12 @@ We should note that basin-hopping is not guaranteed to find the global minimum. 
 SciPy allows the programmer to pass callbacks to both the global and local minimizer, meaning one can record the progress of the algorithm. I wrote code to write the progress to a file and then plot the data over a heatmap such as that in Figure \ref{fig:basicheatmap}.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../images/basin_s10.png}
-	\caption{Each run of the local optimizer for a basin-hopping run to find $\mustar(\sigma=10mm)$.  Points that were \textit{accepted} by the algorithm are green while those that were \textit{rejected} are red. The green + is the true location of \mustar.}
+	\includegraphics[width=0.8\textwidth]{../images/sig19basin.png}
+	\caption{Each run of the local optimizer for a basin-hopping run to find $\mustar(\sigma=19mm)$.  Points that were \textit{accepted} by the algorithm are green while those that were \textit{rejected} are red. The green + is the true location of \mustar.}
 	\label{fig:basin}
 \end{figure}
 
-While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The run in Figure \ref{fig:basin} is an example of a time when basin-hopping failed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 56 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
+While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
 
 \section{Don't Let 10 Minutes of Reading Save You From 10 Hours of Coding}
 

@@ -5,9 +5,15 @@ import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
-def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
+def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True):
     """
-    Plot a dartboard heatmap from a numpy array
+    Plot a heatmap from a numpy array
+    :param arr: array of expected score data
+    :param padding: dont touch this its poisonous
+    :param save_fig: do you wanna save the figure
+    :param fname: filename for if youre saving the figure
+    :param show: do you wanna show the figure
+
     """
     fig, ax = generate_dartboard_plot()
 
@@ -16,9 +22,7 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
 
     # extract mu*
     max_pt = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F')
-    print(xs[max_pt[0]])
-    print(ys[max_pt[1]])
-
+    print(f'Actual mu*: ({xs[max_pt[0]]:.2f}, {ys[max_pt[1]]:.2f}), ')
     heatmap = ax.pcolormesh(
         xs * SCALE_FACTOR, ys * SCALE_FACTOR, arr,
         shading='nearest',
@@ -43,7 +47,9 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
         if not fname:
             fname = int(time.time())
         fig.savefig(f'images/{fname}', dpi=800)
-    plt.show()
+
+    if show:
+        plt.show()
 
 if __name__ == '__main__':
     arr = np.load('/Users/maxcaragozian/Desktop/MATH 305/Darts/heatmap_data/high_res_26.9.npy')

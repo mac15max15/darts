@@ -61,7 +61,7 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, output_pa
 
     max_pt = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F')
 
-    print(f'Estimated mu*: ({xs[max_pt[0]]:.2f}, {ys[max_pt[1]]:.2f}), ')
+    print(f'Basin-hopping estimated mu*: ({xs[max_pt[0]]:.2f}, {ys[max_pt[1]]:.2f}), ')
 
 
     ax.pcolormesh(
@@ -93,4 +93,7 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, output_pa
     plt.show()
 
 if __name__ == "__main__":
-    plot_basin_run('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/basin_hopping_sample.txt', '/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/heatmap_sample.npy')
+    plot_basin_run('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/basin_hopping_sample2.txt',
+                   '/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/heatmap_sample.npy',
+                   save_fig=True,
+                   output_path='images/sig19basin.png')
