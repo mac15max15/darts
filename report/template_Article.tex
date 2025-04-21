@@ -15,6 +15,7 @@
 
 
 \newcommand{\mustar}{\ensuremath{\mu^* }}
+\newcommand{\fmusig}{\ensuremath{F(\mu \vert \sigma)}}
 
 \begin{document}
 
@@ -51,7 +52,12 @@ Before trying to find $\mu^*(\sigma)$, I wrote code that would find the expected
 
 I used SciPy's \textit{nquad} function to perform the integration. Originally, I used the \textit{dblquad} method, which is specific to double integral, but I ran into a rounding issues when $f_x$ was very small. The \textit{nquad} function allows finer control and fixed the issue. 
 
-With the code implementation of Equation \ref{eq:int}, I could fix $\sigma$ and calculate the expected score for normal distributions centered at many different points $\mu$ across the dartboard, returning both the approximate global maximum ($\mu^*$) and data that could be plotted as a heatmap.
+Turning now to the specific case of symmetrical bivariate normal distributions,  let us define the function that takes in a point $\mu$ and returns the expected score of a dart thrown with distribution $\mathcal{N}(\mu, \sigma^2)$ as
+\begin{equation}
+	F(\mu \vert \sigma).
+	\label{eq:fmusig}
+\end{equation}
+With the code implementation of Equation \ref{eq:int}, I could calculate \fmusig for a grid of possible $\mu$ values across the dartboard. I could then both plot the grid as a heatmap and return the maximum calculated value as a numerical approximation for $\mu^*(\sigma)$.
 
 \begin{figure}[h]
 	\centering
@@ -60,26 +66,27 @@ With the code implementation of Equation \ref{eq:int}, I could fix $\sigma$ and 
 	\label{fig:basicheatmap}
 \end{figure}
 
-For each pixel in the heat map I computed 82 double integrals: one for each sector of the dartboard. This was painfully slow, and I spent a lot of time trying to optimize the code by testing the value of the PDF at certain values across the sector so I could skip integrating over sectors that would contribute very little to the final expected score. After a lot of time tinkering with the threshhold for rejecting a sector and how to distribute test points, etc., I came to the conclusion it was easier just to compute every integral. The speedup from my optimization was minimal, and I couldnt escape the fear that by skipping certain integrals I might materially affect the final calculation.
+For each pixel in the heat map (i.e. each evaluation of \fmusig), I needed to compute 82 double integrals: one for each sector of the dartboard. This was painfully slow, and I spent a lot of time trying to optimize the code by testing the value of the PDF at certain values across the sector so I could skip integrating over sectors that would contribute very little to the final expected score. After a lot of time tinkering with the threshhold for rejecting a sector and how to distribute test points, etc., I came to the conclusion it was easier just to compute every integral. The speedup from my optimization was minimal, and I couldnt escape the fear that by skipping certain integrals I might materially affect the final calculation.
 
-STUFF ABOUT TIMKNG
 
-\section{Global Optimization Algorithms}
+\section{Basin-Hopping}
 
-I looked for faster ways to compute  \mustar for a fixed $\sigma$. We can think about the problem as maximizing the function
+I looked for faster ways to compute  \mustar for a fixed $\sigma$. We can think about the computation as a global maximization problem for a function of function of two inputs (the x and y coordinates of $\mu$), that is
 \begin{equation}
-	F(\mu \vert \sigma)  = E[score(\mathcal{N}(\mu, \sigma^2))]
+	\mu^*(\sigma) = \max [F(\mu \vert \sigma)]
 \end{equation}
-over all points  on the dartboard $\mu$. Because optimization algorithms by convention minimize functions rather than maximizing them, we end up computing 
+By convention, global optimization algorithms find the \textit{minimum} of a function, so in practice we compute 
 \begin{equation}
-	\min(-F(\mu \vert \sigma)).
+	\min[-F(\mu \vert \sigma)].
 \end{equation}
 
-SciPy has bindings for several different global minimization algorithms. I ended up settling on a stochastic algorithm called \textit{basin-hopping}. The basin-hopping algorithm takes in an initial guess, and then modifies it by a step of a random size in a random direction. After landing at new point, the algorithm employs a local minimization technique to move ``downhill'' to a local minimum. It then compares the new local minimum with the most recent point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower values being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
+SciPy has bindings for several different global minimization algorithms. I ended up settling on a stochastic algorithm called \textit{basin-hopping}. 
 
+Each iteration of basin-hopping starts with a point (the ``currently accepted point''). The algorithm then takes a jump of a random size in a random direction. After landing at  a new point, the algorithm  moves ``downhill'' to a local minimum and compares the new local minimum with the currently accepted point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower minima being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
+
+Figure \ref{fig:basin} shows a visualization for one run of the basin hopping algorithm
 We should note that basin-hopping is not guaranteed to find the global minimum. If the random jumps never find the right ``basin'', the algorithm will return the wrong answer.
-
-SciPy allows the programmer to pass callbacks to both the global and local minimizer, meaning one can record the progress of the algorithm. I wrote code to write the progress to a file and then plot the data over a heatmap such as that in Figure \ref{fig:basicheatmap}.
+ \ref{fig:basicheatmap}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{../images/sig19basin.png}
@@ -87,9 +94,32 @@ SciPy allows the programmer to pass callbacks to both the global and local minim
 	\label{fig:basin}
 \end{figure}
 
-While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
+While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and sometimes gives the wrong answer, so I decided to go back to square one.
 
-\section{Don't Let 10 Minutes of Reading Save You From 10 Hours of Coding}
+\section{Don't Let Ten Minutes of Reading Save You From Ten Hours of Coding}
+I reread ``A Statistician Playes Darts''\cite{stat} and realized the authors came up with a much faster way to compute $F(\mu \vert \sigma)$ that I missed the first time I read the paper. The authors derived that
+\begin{align}
+	F(\mu \vert \sigma)  =(f_{0, \sigma^2} * score)(\mu),
+\end{align}
+that is the convolution between the PDF of $\mathcal{N}(0, \sigma^2)$ and the score value for each point on the dartboard\cite{stat}. I confess I can't quite wrap my head around how this works and for the scope of this paper I will accept it as magic. Even more magical is that one can compute the convolution extremely quickly with an algorithm that uses a Fast Fourier Transform. Generating the data for a 300 by 300 heatmap such as that in Figure \ref{fig:basicheatmap} took over an hour by integration, but SciPy's \textit{fftconvolve} function gets the job done in seconds. 
+
+The paper \cite{stat} also notes that previous researchers have approximated the same results using a monte-carlo method. To round off my  survey of methods for computing \mustar, I implemented the monte-carlo method. It ended up being considerably faster than direct integration even when taking many samples for each function evaluation. 
+
+\section{Method Comparison and Timing}
+
+We can sum up the methods for computing in a table:
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r  c l}
+		& \textbf{Deterministic} & \textbf{Stochastic} \\ 
+		\textbf{Compute Whole Grid}& Convolution, Integration & Monte Carlo \\
+		\textbf{Compute Single Point}& - & Basin-Hopping
+	\end{tabular}
+\end{table}
+
+For
+
 
 
 

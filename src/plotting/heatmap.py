@@ -3,6 +3,7 @@ from src.math.constants import *
 
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import time
 
 
 def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True):
