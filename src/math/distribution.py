@@ -25,31 +25,61 @@ def main():
     #
     # df.to_csv(f'close_run.csv')
 
-
-    arr = generate_heatmap_data_convolve(10, 300)
-    np.save('../../heatmap_data/s10highres.npy', arr)
-
+    x0, fval, grid, jout = compute_grid_brute(19, calculate_dist_ev_monte_carlo, 30)
+    plot_heatmap(-jout.transpose())
 
 
-def find_best_multinormal_center_numpy_bf(stdev, n=300):
+def compute_grid_brute(stdev, ev_method, n=300):
     """
-    Find the point (x, y) that maximizes the expected score for a dart thrown with
-    a symmetrical normal distribution centered on (x, y) and with standard deviation
-    stdev.
+    Compute the expected score of a symmetrical distribution over a grid
+    of
 
     This method uses SciPy's brute force global optimizer which creates an n by n
     grid of points and evaluates the function (ie the expected value of the distribution)
     at each point. After the brute force, it then uses a gradient-based local optimizer (spi.optimize.fmin)
     to refine the point.
+    :param stdev: standard deviation
+    :param ev_method: method to calculate expected score of the distribution
+    :param n: side length of the grid
+    :return: the optimizer output (see spi documentation for details)
     """
+    dim = DOUB_OUTER+HEATMAP_PAD_MM
     return spi.optimize.brute(
-        lambda x: -calculate_dist_ev(
+        lambda x: -ev_method(
             generate_symmetric_distribution(x[0], x[1], stdev)),
-        ranges=((-DOUB_OUTER, DOUB_OUTER), (-DOUB_OUTER, DOUB_OUTER)),
+        ranges=((-dim, dim), (-dim, dim)),
         Ns=n,
         finish=spi.optimize.fmin,
-        full_output=False
+        full_output=True
     )
+
+def compute_grid_convolve(stdev, n=100, save_data=False, filename=None):
+    dist = generate_symmetric_distribution(0, 0, stdev)
+    grid_extent = DOUB_OUTER + HEATMAP_PAD_MM
+
+    x = np.linspace(-grid_extent, grid_extent, n)
+    y = np.linspace(-grid_extent, grid_extent, n)
+    xv, yv = np.meshgrid(x, y)
+
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+
+    score_grid = np.vectorize(get_score)(xv, yv)
+    coord_grid = np.stack((xv.ravel(), yv.ravel()), axis=-1)
+    pdf_grid = np.array([dist.pdf(pt) for pt in coord_grid]).reshape(xv.shape)
+    mass = np.sum(pdf_grid) * dx * dy
+    pdf_grid /= mass
+
+    arr = spi.signal.fftconvolve(score_grid, pdf_grid, mode='same')
+    arr *= dx * dy
+
+    if save_data:
+        if filename:
+            np.save(filename, arr)
+        else:
+            np.save(f'heatmap_data/convolution/sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
+
+    return arr
 
 
 def find_best_multinormal_center_hopping(
@@ -80,7 +110,7 @@ def find_best_multinormal_center_hopping(
 
 
 def find_best_multinormal_center_convolve(stdev, n=300):
-    arr = generate_heatmap_data_convolve(stdev, n)
+    arr = compute_grid_convolve(stdev, n)
     coords = np.linspace(-DOUB_OUTER - HEATMAP_PAD_MM, DOUB_OUTER + HEATMAP_PAD_MM, n)
     idx_max, max = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F'), np.max(arr)
     return (coords[idx_max[0]], coords[idx_max[1]]), max
@@ -95,57 +125,9 @@ def minimizer_callback(x):
         out.write(f'{x}\n')
 
 
-def generate_heatmap_data_integration(stdev, n=100, disp_pct=False):
 
-    xs = np.linspace(-DOUB_OUTER - HEATMAP_PAD_MM, DOUB_OUTER + HEATMAP_PAD_MM, n)
-    ys = np.linspace(-DOUB_OUTER - HEATMAP_PAD_MM, DOUB_OUTER + HEATMAP_PAD_MM, n)
-
-    results = np.ndarray((n, n))
-    max_ev = 0
-    max_ev_loc = (0, 0)
-
-    for i, x in enumerate(xs):
-        if disp_pct:
-            print(f'{100 * i / n:.2f}%')
-        for j, y in enumerate(ys):
-            dist = generate_symmetric_distribution(x, y, stdev)
-            results[i][j] = calculate_dist_ev(dist)
-
-            if results[i][j] > max_ev:
-                max_ev = results[i][j]
-                max_ev_loc = (x, y)
-
-    np.save(f'heatmap_data/integration/sig{stdev}_{n}pts_{int(time.time())}.npy', results.transpose())
-
-    return max_ev_loc, max_ev
-
-def generate_heatmap_data_convolve(stdev, n=100, save_data=False, filename=None):
-    dist = generate_symmetric_distribution(0, 0, stdev)
-    grid_extent = DOUB_OUTER + HEATMAP_PAD_MM
-
-    x = np.linspace(-grid_extent, grid_extent, n)
-    y = np.linspace(-grid_extent, grid_extent, n)
-    xv, yv = np.meshgrid(x, y)
-
-    dx = x[1] - x[0]
-    dy = y[1] - y[0]
-
-    score_grid = np.vectorize(get_score)(xv, yv)
-    coord_grid = np.stack((xv.ravel(), yv.ravel()), axis=-1)
-    pdf_grid = np.array([dist.pdf(pt) for pt in coord_grid]).reshape(xv.shape)
-    mass = np.sum(pdf_grid) * dx * dy
-    pdf_grid /= mass
-
-    arr = spi.signal.fftconvolve(score_grid, pdf_grid, mode='same')
-    arr *= dx * dy
-
-    if save_data:
-        if filename:
-            np.save(filename, arr)
-        else:
-            np.save(f'heatmap_data/convolution/sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
-
-    return arr
+def calculate_dist_ev_monte_carlo(dist, n=100):
+    return np.mean([get_score(x0[0], x0[1]) for x0 in dist.rvs(n)])
 
 def calculate_dist_ev(dist):
     """

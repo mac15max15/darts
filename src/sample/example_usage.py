@@ -8,7 +8,7 @@ sigma = 19
 
 # Generating and Plotting Heatmap Data
 heatmap_file_name='heatmap_sample.npy'
-heatmap_data = generate_heatmap_data_convolve(sigma, n=300, save_data=True, filename=heatmap_file_name)
+heatmap_data = compute_grid_convolve(sigma, n=300, save_data=True, filename=heatmap_file_name)
 plot_heatmap(heatmap_data, save_fig=False, show=False)
 
 
