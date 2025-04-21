@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-import display
+from src.plotting.display import *
 from src.math.constants import *
 
 def parse_file(filename):
@@ -18,12 +18,13 @@ def parse_file(filename):
     current_set = []
 
     with open(filename, 'r') as file:
+        previous_line = None
         for line in file:
             line = line.strip()
             if not line:
                 continue
 
-            if line.endswith('*'):
+            if line.endswith('*') and not previous_line.endswith('*'):
                 accepted = line[-5] == 'T'
                 accepted_flags.append(accepted)
 
@@ -38,6 +39,8 @@ def parse_file(filename):
                 except ValueError:
                     print(f"Skipping invalid line: {line}")
 
+            previous_line=line
+
     return sets, np.array(accepted_flags)
 
 
@@ -48,18 +51,17 @@ def cm(success):
         return 'r'
 
 
+def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, output_path=None):
 
-if __name__ == '__main__':
-
-    fig, ax = display.generate_dartboard_plot()
-    arr = np.load('heatmap_data/s10highres.npy')
+    fig, ax = generate_dartboard_plot()
+    arr = np.load(heatmap_data_path)
 
     xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
     ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
 
     max_pt = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F')
-    print(xs[max_pt[0]])
-    print(ys[max_pt[1]])
+
+    print(f'Estimated mu*: ({xs[max_pt[0]]:.2f}, {ys[max_pt[1]]:.2f}), ')
 
 
     ax.pcolormesh(
@@ -69,21 +71,11 @@ if __name__ == '__main__':
         cmap=C_MAP
     )
 
-    fn = 'basin_data/test5s10.txt'
-    sets, accepted_flags = parse_file(fn)
-
-
-    with open(fn, 'r') as file:
-        l = list(map(float, ((file.readlines()[-1])[1:-1]).split()))
-        ax.scatter(l[0]*SCALE_FACTOR,l[1]*SCALE_FACTOR, s=5, color='darkgreen', marker='o', linewidths=1.5)
-
+    sets, accepted_flags = parse_file(basin_data_path)
     ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
 
-
-
-
     n=0
-    for i, s in enumerate(sets[:10]):
+    for i, s in enumerate(sets):
 
         xs = SCALE_FACTOR*np.array(s[0,:])
         ys = SCALE_FACTOR*np.array(s[1,:])
@@ -95,7 +87,10 @@ if __name__ == '__main__':
         ax.text(xs[0]+.03, ys[0]+.03, str(i+1), weight='bold')
 
     fig.tight_layout()
-    fig.savefig('images/basin_s1020.png', dpi=800)
-    print(n)
+    if save_fig and output_path:
+        fig.savefig(output_path, dpi=800)
+    print(f'# of F(mu|sigma) evaluations: {n}')
     plt.show()
 
+if __name__ == "__main__":
+    plot_basin_run('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/basin_hopping_sample.txt', '/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/heatmap_sample.npy')

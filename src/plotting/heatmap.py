@@ -32,7 +32,7 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None):
         height="100%",
         loc='lower left',
         borderpad=0,
-        bbox_to_anchor=(1.02, 0., 1, 1),
+        bbox_to_anchor=(1.01, 0., 1, 1),
         bbox_transform=ax.transAxes
     )
 

@@ -3,7 +3,9 @@ from matplotlib.patches import *
 from matplotlib.path import Path
 
 from src.math.sector import *
-
+"""
+This file contains the code for generating a blank dartboard plot
+"""
 def main():
     fig, ax = generate_dartboard_plot()
     plt.show()

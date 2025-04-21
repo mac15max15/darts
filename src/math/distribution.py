@@ -8,7 +8,7 @@ from src.math.constants import *
 
 
 sectors = get_sectors()
-of = 'fasdfas.txt'
+of = 'output.txt'
 
 
 def main():
@@ -52,7 +52,17 @@ def find_best_multinormal_center_numpy_bf(stdev, n=300):
     )
 
 
-def find_best_multinormal_center_hopping(stdev, t=1, niter_sucess=5, stepsize=150):
+def find_best_multinormal_center_hopping(
+        stdev,
+        t=1,
+        niter_sucess=5,
+        stepsize=150,
+        filename=None):
+
+    if filename:
+        global of
+        of = filename
+
     return spi.optimize.basinhopping(
         lambda x: -calculate_dist_ev(
             generate_symmetric_distribution(x[0], x[1], stdev)
@@ -109,7 +119,7 @@ def generate_heatmap_data_integration(stdev, n=100, disp_pct=False):
 
     return max_ev_loc, max_ev
 
-def generate_heatmap_data_convolve(stdev, n=100, save_data=False):
+def generate_heatmap_data_convolve(stdev, n=100, save_data=False, filename=None):
     dist = generate_symmetric_distribution(0, 0, stdev)
     grid_extent = DOUB_OUTER + HEATMAP_PAD_MM
 
@@ -130,7 +140,10 @@ def generate_heatmap_data_convolve(stdev, n=100, save_data=False):
     arr *= dx * dy
 
     if save_data:
-        np.save(f'heatmap_data/convolution/sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
+        if filename:
+            np.save(filename, arr)
+        else:
+            np.save(f'heatmap_data/convolution/sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
 
     return arr
 

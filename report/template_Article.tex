@@ -70,12 +70,12 @@ I looked for faster ways to compute  \mustar for a fixed $\sigma$. We can think 
 \begin{equation}
 	F(\mu \vert \sigma)  = E[score(\mathcal{N}(\mu, \sigma^2))]
 \end{equation}
-over all points  on the dartboard $\mu$. Because optimization algorithms by convention minimize functilns rather than maximizing them, we end up computing 
+over all points  on the dartboard $\mu$. Because optimization algorithms by convention minimize functions rather than maximizing them, we end up computing 
 \begin{equation}
 	\min(-F(\mu \vert \sigma)).
 \end{equation}
 
-SciPy has bindings for several different global minimization algorithms. I ended up settling on an stochastic algorithm called \textit{basin-hopping}. The basin-hopping algorithm takes in an initial guess, and then modifies it by a step of a random size in a random direction. After landing at new point, the algorithm employs a local minimization technique to move ``downhill'' to a local minimum. It then compares the new local minimum with the most recent point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower values being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
+SciPy has bindings for several different global minimization algorithms. I ended up settling on a stochastic algorithm called \textit{basin-hopping}. The basin-hopping algorithm takes in an initial guess, and then modifies it by a step of a random size in a random direction. After landing at new point, the algorithm employs a local minimization technique to move ``downhill'' to a local minimum. It then compares the new local minimum with the most recent point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower values being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
 
 We should note that basin-hopping is not guaranteed to find the global minimum. If the random jumps never find the right ``basin'', the algorithm will return the wrong answer.
 
@@ -87,7 +87,7 @@ SciPy allows the programmer to pass callbacks to both the global and local minim
 	\label{fig:basin}
 \end{figure}
 
-While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The run in Figure \ref{fig:basin} is an example of a time when basin-hopping failed to find the true global minimum. The other problem is that basin-stopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 56 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
+While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The run in Figure \ref{fig:basin} is an example of a time when basin-hopping failed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 56 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and it got the wrong answer, so I decided to go back to square one.
 
 \section{Don't Let 10 Minutes of Reading Save You From 10 Hours of Coding}
 
