@@ -42,7 +42,8 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=T
         bbox_transform=ax.transAxes
     )
     plt.rcParams['text.usetex'] = True
-    fig.colorbar(heatmap, cax=cax, label=rf'Expected Score, $F(\mu \vert \sigma = {sigma})$',)
+    ticks = np.arange(np.min(arr), np.max(arr), (np.max(arr) - np.min(arr))//5)
+    fig.colorbar(heatmap, cax=cax, label=rf'Expected Score, $F(\mu \vert \sigma = {sigma})$', ticks=ticks)
 
     ax.scatter(xs[max_pt[0]]*SCALE_FACTOR, ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
     if save_fig:
