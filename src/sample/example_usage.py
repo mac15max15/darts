@@ -15,8 +15,6 @@ plot_heatmap(heatmap_data, sigma=sigma, save_fig=False, show=True)
 
 
 # Running Basin-Hopping
-
-
 print('Running Basin Hopping...')
 # this will take a while to run. lower niter_sucess for faster but less accurate runs
 find_best_multinormal_center_hopping(
