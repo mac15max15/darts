@@ -10,7 +10,7 @@
 \usepackage[backend=bibtex]{biblatex}
 \addbibresource{refs.bib}
 %opening
-\title{Darts}
+\title{Using A Function Derived From Darts to Visualize Global Optimization Algorithms}
 \author{Max Caragozian}
 
 
@@ -25,13 +25,13 @@
 \epigraph{The tap-room fire is alight again and a new stock of darts laid in; serviceable and well-feathered, that fly true and will see us into another spring.}{``A Chiltern Autumn'' \cite{1929spectator}}
 
 \section{Introcudction}
-When I moved to Rochester this past January, I bought a dartboard and hung it in the basement of my college house. It ended up being a worthwhile purchase, both as a way to get to know my new roommates and as time killer for what ended up being a long, snowy winter. I started reading into the mathematics of darts and came across the paper ``A Statistician Plays Darts''\cite{stat},  which quantifies how a dart thrower's skill affects where he/she should aim. 
+I bought a dartboard for my college house this past January, and darts quickly became a common pastime during what ended up being a long, snowy winter. I started reading into the mathematics of darts and came across the paper ``A Statistician Plays Darts'' by \citeauthor{stat}\cite{stat}. The paper quantifies how a dart thrower's skill affects where he/she should aim. 
 
 In the simplest model, the authors assume that a person throws with a symmetrical bivariate normal distribution. They estimate the function $\mu^*(\sigma)$ that takes in a standard deviation $\sigma$ and outputs a point $\mu$ that maximizes the expected score of a dart thrown with distribution $\mathcal{N}(\mu, \sigma^2)$.
 
-Bad sentence -> Unsurprisingly, the authors found that a person with a very small standard deviation should aim for the triple 20 (T20), as it has the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where the optimal location jumps to the T19, before eventually moving towards the center of the board.
+The authors found that a person with a very small standard deviation should aim for the triple 20 (T20), which shouldn't be surprising as it has the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where the optimal location jumps to the T19, before eventually moving towards the center of the board.
 
-At the outset of this project, my aim was to replicate some of the results of ``A Statistician Plays Darts.''\cite{stat} Along the way, I found that there is more than one way to get there and learned much about global optimization algorithms. This paper documents the several methods I tried, how I implemented them, and how each method 111
+This project compares four different ways to replicate that result.
 
 \begin{figure}
 	\centering
@@ -66,7 +66,7 @@ With the code implementation of Equation \ref{eq:int}, I could calculate \fmusig
 	\label{fig:basicheatmap}
 \end{figure}
 
-For each pixel in the heat map (i.e. each evaluation of \fmusig), I needed to compute 82 double integrals: one for each sector of the dartboard. This was painfully slow, and I spent a lot of time trying to optimize the code by testing the value of the PDF at certain values across the sector so I could skip integrating over sectors that would contribute very little to the final expected score. After a lot of time tinkering with the threshhold for rejecting a sector and how to distribute test points, etc., I came to the conclusion it was easier just to compute every integral. The speedup from my optimization was minimal, and I couldnt escape the fear that by skipping certain integrals I might materially affect the final calculation.
+For each pixel in the heat map (i.e. each evaluation of \fmusig), I needed to compute 82 double integrals, and this method is painfully slow (see Section \ref{sec:timing} for exact numbers).
 
 
 \section{Basin-Hopping}
@@ -94,32 +94,33 @@ We should note that basin-hopping is not guaranteed to find the global minimum. 
 	\label{fig:basin}
 \end{figure}
 
-While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. There were two main issues, the of which first I have already noted: basin hopping is not guaranteed to find the true global minimum. The other problem is that basin-hopping still relies on the slow process of integration for each point that it tests. To be sure, it is still faster than brute force. The basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. But it was still slow and sometimes gives the wrong answer, so I decided to go back to square one.
+While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. Besides not being guaranteed to find the correct solution, basin hopping still relies on the slow process of integration.To be sure, it is still faster than brute force: the basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. 
 
 \section{Don't Let Ten Minutes of Reading Save You From Ten Hours of Coding}
 I reread ``A Statistician Playes Darts''\cite{stat} and realized the authors came up with a much faster way to compute $F(\mu \vert \sigma)$ that I missed the first time I read the paper. The authors derived that
 \begin{align}
-	F(\mu \vert \sigma)  =(f_{0, \sigma^2} * score)(\mu),
+	F(\mu \vert \sigma)  =(f_{0, \sigma^2} * score)(\mu)
 \end{align}
-that is the convolution between the PDF of $\mathcal{N}(0, \sigma^2)$ and the score value for each point on the dartboard\cite{stat}. I confess I can't quite wrap my head around how this works and for the scope of this paper I will accept it as magic. Even more magical is that one can compute the convolution extremely quickly with an algorithm that uses a Fast Fourier Transform. Generating the data for a 300 by 300 heatmap such as that in Figure \ref{fig:basicheatmap} took over an hour by integration, but SciPy's \textit{fftconvolve} function gets the job done in seconds. 
+ where $*$ is the convolution between the PDF of $\mathcal{N}(0, \sigma^2)$ and the score value for each point on the dartboard\cite{stat}. I confess I can't quite wrap my head around how this works and for the scope of this paper I will accept it as magic. Even more magical is that one can compute the convolution extremely quickly with an algorithm that uses a Fast Fourier Transform. Generating the data for a 300 by 300 heatmap such as that in Figure \ref{fig:basicheatmap} took over an hour by integration, but SciPy's \textit{fftconvolve} function gets the job done in seconds. 
 
-The paper \cite{stat} also notes that previous researchers have approximated the same results using a monte-carlo method. To round off my  survey of methods for computing \mustar, I implemented the monte-carlo method. It ended up being considerably faster than direct integration even when taking many samples for each function evaluation. 
+\citeauthor{stat} also note that previous researchers have approximated the same results using a monte-carlo method\cite{stat}. To round off my  survey of methods for computing \mustar, I implemented the monte-carlo method. It ended up being considerably faster than direct integration even when taking many samples for each function evaluation. 
 
-\section{Method Comparison and Timing}
+\section{Method Comparison, Timing, and Final Discussion}\label{sec:timing}
 
 We can sum up the methods for computing in a table:
 
 \begin{table}[h]
 	\centering
-	\begin{tabular}{r  c l}
-		& \textbf{Deterministic} & \textbf{Stochastic} \\ 
+	\begin{tabular}{r | c l}
+		& \textbf{Deterministic} & \textbf{Stochastic} \\ \hline
 		\textbf{Compute Whole Grid}& Convolution, Integration & Monte Carlo \\
 		\textbf{Compute Single Point}& - & Basin-Hopping
 	\end{tabular}
 \end{table}
 
-For
+We can directly compare the speeds of those methods that compute a grid of points, paramaterizing by $n$, the side length of the grid. 
 
+None of my homegrown methods for computing \mustar performed better than the convolution algorithm derived by \citeauthor{stat}. I think, however, that it is a valuable example of how a change in overall method can have a much greater impact than optimization within a method. 
 
 
 

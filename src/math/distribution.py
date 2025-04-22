@@ -13,24 +13,16 @@ of = 'output.txt'
 
 
 def main():
-    # sigmas = np.arange(16, 17, .05)
-    # df = pd.DataFrame(
-    #     index=sigmas,
-    #     columns=['x', 'y', 'ev']
-    # )
-    #
-    # for sigma in sigmas:
-    #     center, ev = find_best_multinormal_center_convolve(sigma, 500)
-    #     df.loc[sigma] = {'x': center[0], 'y': center[1], 'ev': ev}
-    #     print(sigma)
-    #
-    # df.to_csv(f'close_run.csv')
+    arr = compute_grid_convolve(10, 300)
 
-    arr = compute_grid_brute(19, calculate_dist_ev_monte_carlo, 20)
-    plot_heatmap(arr)
+    plot_heatmap(arr, fname='s10.png', save_fig=True, sigma=10)
+
+    arr = compute_grid_convolve(30, 300)
+
+    plot_heatmap(arr, fname='s30.png', save_fig=True, sigma=30)
 
 
-def compute_grid_brute(stdev, ev_method, n=300, monte_carlo_n=100):
+def compute_grid_brute(stdev, ev_method, n=300, mn=100):
     """
     Compute the expected score of a symmetrical distribution over a grid
     of points
@@ -40,6 +32,8 @@ def compute_grid_brute(stdev, ev_method, n=300, monte_carlo_n=100):
     :param n: side length of the grid
     :return: grid of expected scores
     """
+    global monte_carlo_n
+    monte_carlo_n=mn
 
     coords = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, n)
     func = np.vectorize(lambda x, y: ev_method(generate_symmetric_distribution(x, y, stdev)))

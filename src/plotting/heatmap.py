@@ -1,12 +1,13 @@
 from src.math.distribution import *
 from src.math.constants import *
+from src.plotting.display import *
 
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import time
 
 
-def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True):
+def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True, sigma=0):
     """
     Plot a heatmap from a numpy array
     :param arr: array of expected score data
@@ -33,25 +34,25 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=T
 
     cax = inset_axes(
         ax,
-        width="3%",
+        width="2%",
         height="100%",
         loc='lower left',
         borderpad=0,
-        bbox_to_anchor=(1.01, 0., 1, 1),
+        bbox_to_anchor=(1.005, 0., 1, 1),
         bbox_transform=ax.transAxes
     )
-
-    fig.colorbar(heatmap, cax=cax, label='Expected Score')
+    plt.rcParams['text.usetex'] = True
+    fig.colorbar(heatmap, cax=cax, label=rf'Expected Score, $F(\mu \vert \sigma = {sigma})$',)
 
     ax.scatter(xs[max_pt[0]]*SCALE_FACTOR, ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
     if save_fig:
         if not fname:
             fname = int(time.time())
-        fig.savefig(f'images/{fname}', dpi=800)
+        fig.savefig(f'../../images/{fname}', dpi=800)
 
     if show:
         plt.show()
 
 if __name__ == '__main__':
     arr = np.load('/Users/maxcaragozian/Desktop/MATH 305/Darts/heatmap_data/high_res_26.9.npy')
-    plot_heatmap(arr, fname='gistheat.png', save_fig=False)
+    plot_heatmap(arr, fname='gist_hear.png', save_fig=True, sigma=26.9)

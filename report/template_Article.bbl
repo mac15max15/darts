@@ -39,34 +39,6 @@
     \endverb
   \endentry
 
-  \entry{stat}{article}{}
-    \name{author}{2}{}{%
-      {{hash=RTAP}{%
-         family={Ryan\bibnamedelima Tibshirani},
-         familyi={R\bibinitperiod\bibinitdelim T\bibinitperiod},
-         given={Andrew\bibnamedelima Price},
-         giveni={A\bibinitperiod\bibinitdelim P\bibinitperiod},
-      }}%
-      {{hash=TJ}{%
-         family={Taylor},
-         familyi={T\bibinitperiod},
-         given={Jonathan},
-         giveni={J\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{RTAPTJ1}
-    \strng{fullhash}{RTAPTJ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{sortinit}{R}
-    \field{sortinithash}{R}
-    \field{pages}{213\bibrangedash 226}
-    \field{title}{A Statistician Plays Darts}
-    \field{volume}{174}
-    \field{journaltitle}{Journal of the Royal Statistical Society Series A}
-    \field{year}{2011}
-  \endentry
-
   \entry{diag}{misc}{}
     \name{author}{1}{}{%
       {{hash=ST}{%
@@ -102,6 +74,40 @@
     \verb https://books.google.com/books?id=mniapACANGEC
     \endverb
     \field{year}{1929}
+  \endentry
+
+  \entry{stat}{article}{}
+    \name{author}{3}{}{%
+      {{hash=TR}{%
+         family={Tibshirani},
+         familyi={T\bibinitperiod},
+         given={Ryan},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=PA}{%
+         family={Price},
+         familyi={P\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TJ}{%
+         family={Taylor},
+         familyi={T\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TRPATJ1}
+    \strng{fullhash}{TRPATJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \field{pages}{213\bibrangedash 226}
+    \field{title}{A Statistician Plays Darts}
+    \field{volume}{174}
+    \field{journaltitle}{Journal of the Royal Statistical Society Series A}
+    \field{year}{2011}
   \endentry
 \enddatalist
 \endinput
