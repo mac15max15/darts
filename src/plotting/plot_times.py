@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    df = pd.read_csv('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/timing/heatmap_timing2-100.csv')
+    df = pd.read_csv('/timing_data/heatmap_timing2-100.csv')
     df = df[df['n'] < 20]
     plot_times(df)
 
