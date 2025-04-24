@@ -2,4 +2,6 @@
 **/*.npy
 **/*.png
 **/*.csv
+presentation/*
+report/*
 
