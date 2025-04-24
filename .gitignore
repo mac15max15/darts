@@ -4,4 +4,5 @@
 **/*.csv
 presentation/*
 report/*
+*.DS_Store
 
