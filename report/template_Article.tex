@@ -6,9 +6,19 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{graphicx}
-%\usepackage{hyperref}
 \usepackage[backend=bibtex]{biblatex}
+
 \addbibresource{refs.bib}
+
+\usepackage{etoolbox}
+\makeatletter
+\newlength\epitextskip
+\pretocmd{\@epitext}{\em}{}{}
+\apptocmd{\@epitext}{\em}{}{}
+\patchcmd{\epigraph}{\@epitext{#1}\\}{\@epitext{#1}\\[\epitextskip]}{}{}
+\makeatother
+
+\setlength\epigraphwidth{.8\textwidth}
 %opening
 \title{Using A Function Derived From Darts to Visualize Global Optimization Algorithms}
 \author{Max Caragozian}
@@ -22,14 +32,14 @@
 \maketitle
 
 
-\epigraph{The tap-room fire is alight again and a new stock of darts laid in; serviceable and well-feathered, that fly true and will see us into another spring.}{``A Chiltern Autumn'' \cite{1929spectator}}
+\epigraph{The tap-room fire is alight again and a new stock of darts laid in; serviceable and well-feathered, that fly true and will see us into another spring.}{H. M., \emph{``A Chiltern Autumn''} \cite{1929spectator}}
 
 \section{Introcudction}
-I bought a dartboard for my college house this past January, and darts quickly became a common pastime during what ended up being a long, snowy winter. I started reading into the mathematics of darts and came across the paper ``A Statistician Plays Darts'' by \citeauthor{stat}\cite{stat}. The paper quantifies how a dart thrower's skill affects where he/she should aim. 
+I bought a dartboard for my college house this past January, and darts quickly became a common pastime during what ended up being a long, snowy winter. I started reading into the mathematics of darts and came across the paper ``A Statistician Plays Darts\cite{stat}'' by \citeauthor{stat}. The paper quantifies how the optimal place to aim a dart relates to the skill of the thrower.
 
-In the simplest model, the authors assume that a person throws with a symmetrical bivariate normal distribution. They estimate the function $\mu^*(\sigma)$ that takes in a standard deviation $\sigma$ and outputs a point $\mu$ that maximizes the expected score of a dart thrown with distribution $\mathcal{N}(\mu, \sigma^2)$.
+In the simplest model, the authors assume that a person throws with a symmetrical bivariate normal distribution. They estimate the function $\mu^*(\sigma)$ that takes in a standard deviation $\sigma$ and outputs a point $\mu$ which maximizes the expected score of a dart thrown with distribution $\mathcal{N}(\mu, \sigma^2)$.
 
-The authors found that a person with a very small standard deviation should aim for the triple 20 (T20), which shouldn't be surprising as it has the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where the optimal location jumps to the T19, before eventually moving towards the center of the board.
+The authors found that a person with a very small standard deviation (that is, a very skilled player) should aim for the triple 20 (T20), which shouldn't be surprising as it has the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where the optimal location jumps to the T19, before eventually moving towards the center of the board.
 
 This project compares four different ways to replicate that result.
 
@@ -57,7 +67,7 @@ Turning now to the specific case of symmetrical bivariate normal distributions, 
 	F(\mu \vert \sigma).
 	\label{eq:fmusig}
 \end{equation}
-With the code implementation of Equation \ref{eq:int}, I could calculate \fmusig for a grid of possible $\mu$ values across the dartboard. I could then both plot the grid as a heatmap and return the maximum calculated value as a numerical approximation for $\mu^*(\sigma)$.
+With the code implementation of Equation \ref{eq:int}, I could calculate $F(\mu \vert \sigma)$ for a grid of possible $\mu$ values across the dartboard. I could then both plot the grid as a heatmap and return the maximum calculated value as a numerical approximation for $\mu^*(\sigma)$.
 
 \begin{figure}[h]
 	\centering
@@ -66,7 +76,7 @@ With the code implementation of Equation \ref{eq:int}, I could calculate \fmusig
 	\label{fig:basicheatmap}
 \end{figure}
 
-For each pixel in the heat map (i.e. each evaluation of \fmusig), I needed to compute 82 double integrals, and this method is painfully slow (see Section \ref{sec:timing} for exact numbers).
+For each pixel in the heat map (i.e. each evaluation of $F(\mu \vert \sigma)$), I needed to compute 82 double integrals, and this method was painfully slow (see Section \ref{sec:timing} for exact numbers).
 
 
 \section{Basin-Hopping}
@@ -82,10 +92,13 @@ By convention, global optimization algorithms find the \textit{minimum} of a fun
 
 SciPy has bindings for several different global minimization algorithms. I ended up settling on a stochastic algorithm called \textit{basin-hopping}. 
 
-Each iteration of basin-hopping starts with a point (the ``currently accepted point''). The algorithm then takes a jump of a random size in a random direction. After landing at  a new point, the algorithm  moves ``downhill'' to a local minimum and compares the new local minimum with the currently accepted point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower minima being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained unchallenged for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}. 
+Each iteration of basin-hopping starts with a point (the ``currently accepted point''). The algorithm then takes a jump of a random size in a random direction. After landing at  a new point, the algorithm  moves ``downhill'' to a local minimum and compares the new local minimum with the currently accepted point. If the new minimum is lower than the previous one, it is always accepted. If it is not lower, there is a random process to decide whether or not to accept it, with lower minima being more likely to be accepted. The process then repeats, with another random perturbation, a local minimization, and a comparison with the most recently accepted point. Over time, random jumps get smaller, and the algorithm ends when a point has remained an unchallenged candidate for the global minimum for some number of cycles. The distribution of jump sizes, the local minimization algorithm, and the acceptance criteria for new points can all be controlled by parameters \cite{basin}.
 
-Figure \ref{fig:basin} shows a visualization for one run of the basin hopping algorithm
-We should note that basin-hopping is not guaranteed to find the global minimum. If the random jumps never find the right ``basin'', the algorithm will return the wrong answer.
+We should note that basin-hopping is not guaranteed to find the global minimum. If the random jumps never find the right ``basin'', the algorithm will return the wrong answer. 
+
+Figure \ref{fig:basin} shows a visualization for one run of the basin hopping algorithm. Each line represents one pass of the local optimizer, with the dots being the local minima. 
+
+
  \ref{fig:basicheatmap}.
 \begin{figure}[h!]
 	\centering
@@ -94,14 +107,14 @@ We should note that basin-hopping is not guaranteed to find the global minimum. 
 	\label{fig:basin}
 \end{figure}
 
-While the dartboard problem proved a good way to illustrate basin-hopping, basin-hopping was not a good way to solve my dartboard problem. Besides not being guaranteed to find the correct solution, basin hopping still relies on the slow process of integration.To be sure, it is still faster than brute force: the basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 9000 for a $300 \times 300$ heatmap. 
+While computing $\mu^*$ proved a good way to illustrate basin-hopping, basin-hopping was not a good way to compute $\mu^*$. Besides not being guaranteed to find the correct solution, basin-hopping still relies on the slow process of integration.To be sure, it is still faster than brute force: the basin-hopping run in Figure \ref{fig:basin} needed only 134 evaluations of $F(\mu \vert \sigma)$, compared to 90,000 for a $300 \times 300$ heatmap. But with the added overhead of the algorithm, it still took time on the order of minutes to compute $\mu^*$, and I wanted to find a better way.
 
 \section{Don't Let Ten Minutes of Reading Save You From Ten Hours of Coding}
 I reread ``A Statistician Playes Darts''\cite{stat} and realized the authors came up with a much faster way to compute $F(\mu \vert \sigma)$ that I missed the first time I read the paper. The authors derived that
 \begin{align}
 	F(\mu \vert \sigma)  =(f_{0, \sigma^2} * score)(\mu)
 \end{align}
- where $*$ is the convolution between the PDF of $\mathcal{N}(0, \sigma^2)$ and the score value for each point on the dartboard\cite{stat}. I confess I can't quite wrap my head around how this works and for the scope of this paper I will accept it as magic. Even more magical is that one can compute the convolution extremely quickly with an algorithm that uses a Fast Fourier Transform. Generating the data for a 300 by 300 heatmap such as that in Figure \ref{fig:basicheatmap} took over an hour by integration, but SciPy's \textit{fftconvolve} function gets the job done in seconds. 
+ where $*$ is the convolution between the PDF of $\mathcal{N}(0, \sigma^2)$ and the score value for each point on the dartboard\cite{stat}. One can compute the convolution extremely quickly with an algorithm that uses a Fast Fourier Transform. Generating the data for a 300 by 300 heatmap such as that in Figure \ref{fig:basicheatmap} took over an hour by integration, but SciPy's \textit{fftconvolve} function gets the job done in seconds. 
 
 \citeauthor{stat} also note that previous researchers have approximated the same results using a monte-carlo method\cite{stat}. To round off my  survey of methods for computing \mustar, I implemented the monte-carlo method. It ended up being considerably faster than direct integration even when taking many samples for each function evaluation. 
 
@@ -111,10 +124,10 @@ We can sum up the methods for computing in a table:
 
 \begin{table}[h]
 	\centering
-	\begin{tabular}{r | c l}
+	\begin{tabular}{r  l l}
 		& \textbf{Deterministic} & \textbf{Stochastic} \\ \hline
-		\textbf{Compute Whole Grid}& Convolution, Integration & Monte Carlo \\
-		\textbf{Compute Single Point}& - & Basin-Hopping
+		\textbf{Compute Whole Grid} \vline& Convolution, Integration & Monte Carlo \\
+		\textbf{Compute Single Point} \vline& \multicolumn{1}{c}{-} & Basin-Hopping
 	\end{tabular}
 \end{table}
 

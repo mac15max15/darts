@@ -5,13 +5,20 @@ from src.plotting.plot_basin import *
 
 ## Example for Plotting Heatmap and Basin-Hopping ##
 sigma = 10
-heatmap_file_name='heatmap_sample.npy'
-bh_filename = 'basin_hopping_sample3.txt'
+n = 10  # grid size
+heatmap_file_name = '../../heatmap_data/sample.npy'
+bh_filename = '../../basin_data/sample_basin.txt'
 
 
 # Generating and Plotting Heatmap Data
-heatmap_data = compute_grid_convolve(sigma, n=300, save_data=True, filename=heatmap_file_name)
-plot_heatmap(heatmap_data, sigma=sigma, save_fig=False, show=True)
+
+# integration
+heatmap_data_integrate = compute_grid_brute(sigma, calculate_dist_ev_integration, n=n)
+plot_heatmap(heatmap_data_integrate, sigma=sigma, save_fig=False, show=True, title='Integration')
+
+# convolution
+heatmap_data_convolve = compute_grid_convolve(sigma, n=n, save_data=True, filename=heatmap_file_name)
+plot_heatmap(heatmap_data_convolve, sigma=sigma, save_fig=False, show=True,title='Convolution')
 
 
 # Running Basin-Hopping

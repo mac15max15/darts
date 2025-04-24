@@ -39,6 +39,31 @@
     \endverb
   \endentry
 
+  \entry{1929spectator}{article}{}
+    \name{author}{1}{}{%
+      {{hash=MH}{%
+         family={M.},
+         familyi={M\bibinitperiod},
+         given={H.},
+         giveni={H\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MH1}
+    \strng{fullhash}{MH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{number}{5289}
+    \field{title}{A Chiltern Autumn}
+    \verb{url}
+    \verb https://books.google.com/books?id=mniapACANGEC
+    \endverb
+    \field{volume}{143}
+    \field{journaltitle}{The Spectator}
+    \field{year}{1929}
+  \endentry
+
   \entry{diag}{misc}{}
     \name{author}{1}{}{%
       {{hash=ST}{%
@@ -59,21 +84,6 @@
     \verb https://commons.wikimedia.org/wiki/File:Dartboard_diagram.svg
     \endverb
     \field{year}{2014}
-  \endentry
-
-  \entry{1929spectator}{book}{}
-    \list{publisher}{1}{%
-      {The Spectator}%
-    }
-    \field{labeltitlesource}{title}
-    \field{sortinit}{T}
-    \field{sortinithash}{T}
-    \field{number}{v. 143, nos. 5271-5296}
-    \field{title}{The Spectator}
-    \verb{url}
-    \verb https://books.google.com/books?id=mniapACANGEC
-    \endverb
-    \field{year}{1929}
   \endentry
 
   \entry{stat}{article}{}

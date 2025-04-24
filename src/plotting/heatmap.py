@@ -7,7 +7,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import time
 
 
-def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True, sigma=0):
+def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=True, sigma=0, title=None):
     """
     Plot a heatmap from a numpy array
     :param arr: array of expected score data
@@ -46,6 +46,10 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, fname=None, show=T
     fig.colorbar(heatmap, cax=cax, label=rf'Expected Score, $F(\mu \vert \sigma = {sigma})$', ticks=ticks)
 
     ax.scatter(xs[max_pt[0]]*SCALE_FACTOR, ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
+
+    if title:
+        ax.set_title(title)
+
     if save_fig:
         if not fname:
             fname = int(time.time())
