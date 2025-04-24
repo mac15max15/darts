@@ -61,7 +61,7 @@ def compute_grid_convolve(stdev, n=100, save_data=False, filename=None):
         if filename:
             np.save(filename, arr)
         else:
-            np.save(f'heatmap_data/convolution/sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
+            np.save(f'sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
 
     return arr
 

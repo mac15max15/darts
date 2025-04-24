@@ -11,7 +11,7 @@ def main():
 def plot_times(timing_df):
     fig, ax = plt.subplots(1, 1, squeeze=True)
 
-    lines = timing_df.plot(
+    timing_df.plot(
         x='n',
         y=['integration', 'montecarlo10^2','montecarlo10^5','convolution'],
         ax=ax,

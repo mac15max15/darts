@@ -51,7 +51,7 @@ def cm(success):
         return 'r'
 
 
-def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, output_path=None):
+def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=None):
 
     fig, ax = generate_dartboard_plot()
     arr = np.load(heatmap_data_path)
@@ -87,8 +87,8 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, output_pa
         ax.text(xs[0]+.03, ys[0]+.03, str(i+1), weight='bold')
 
     fig.tight_layout()
-    if save_fig and output_path:
-        fig.savefig(output_path, dpi=800)
+    if save_fig and filename:
+        fig.savefig(f'../../images/{filename}', dpi=800)
     print(f'# of F(mu|sigma) evaluations: {n}')
     plt.show()
 
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     plot_basin_run('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/basin_hopping_sample2.txt',
                    '/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/heatmap_sample.npy',
                    save_fig=True,
-                   output_path='images/sig19basin.png')
+                   filename='images/sig19basin.png')

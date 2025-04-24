@@ -7,6 +7,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[backend=bibtex]{biblatex}
+\usepackage{hyperref}
 
 \addbibresource{refs.bib}
 
@@ -138,7 +139,10 @@ Let us summarize the four methods in a table:
 
 As seen in Figure \ref{fig:time}, none of my home-grown methods for computing $\mu^*$ performed better than the convolution algorithm derived by \citeauthor{stat}.  Not that I exhausted every option. For example, my basin-hopping code uses only direct integration for its function evaluations, but there is no reason why I could not have used Monte-Carlo, which would be significantly faster. My code would also work for distributions other than a bivariate normal, but I did not have time to pursue that.
 
-The shear number of paths I \emph{couldn't} investigate hints at the real value in this project. $F(\mu \vert \sigma)$ is easy to understand but hard to calculate, making it a good test case for a wide variety of global optimization algorithms. It is also a function of two inputs, which lends itself to visuals and real world interpretations like ``moving downhill.'' 
+The shear number of paths I \emph{couldn't} investigate hints at the real value in this project. $F(\mu \vert \sigma)$ is easy to understand but hard to calculate, making it a good test case for a wide variety of global optimization algorithms. It is also a function of two inputs, which lends itself to visuals and real world interpretations like ``moving downhill.''
+
+\section{Github}
+The code for this project can be found \href
 
 
 
