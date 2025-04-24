@@ -43,23 +43,19 @@ def compute_grid_brute(stdev, ev_method, n=300, mn=100):
 
 def compute_grid_convolve(stdev, n=100, save_data=False, filename=None):
     dist = generate_symmetric_distribution(0, 0, stdev)
-    grid_extent = DOUB_OUTER + HEATMAP_PAD_MM
+    coords = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, n)
 
-    x = np.linspace(-grid_extent, grid_extent, n)
-    y = np.linspace(-grid_extent, grid_extent, n)
-    xv, yv = np.meshgrid(x, y)
-
-    dx = x[1] - x[0]
-    dy = y[1] - y[0]
+    xv, yv = np.meshgrid(coords, coords)
 
     score_grid = np.vectorize(get_score)(xv, yv)
-    coord_grid = np.stack((xv.ravel(), yv.ravel()), axis=-1)
-    pdf_grid = np.array([dist.pdf(pt) for pt in coord_grid]).reshape(xv.shape)
-    mass = np.sum(pdf_grid) * dx * dy
+    pdf_grid = dist.pdf(np.stack([xv, yv], axis=-1))
+
+    dx = coords[1] - coords[0]
+    mass = np.sum(pdf_grid) * dx * dx
     pdf_grid /= mass
 
     arr = spi.signal.fftconvolve(score_grid, pdf_grid, mode='same')
-    arr *= dx * dy
+    arr *= dx * dx
 
     if save_data:
         if filename:
@@ -153,12 +149,6 @@ def generate_symmetric_distribution(x, y, stdev):
 
 def get_covariance_mat(stdev):
     return np.eye(2) * (stdev ** 2)
-
-
-class UniformDist:
-    def pdf(self, x):
-        return 1 / (np.pi * 170 * 170)
-
 
 
 if __name__ == "__main__":

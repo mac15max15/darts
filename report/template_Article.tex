@@ -39,7 +39,7 @@ I bought a dartboard for my college house this past January, and darts quickly b
 
 In the simplest model, the authors assume that a person throws with a symmetrical bivariate normal distribution. They estimate the function $\mu^*(\sigma)$ that takes in a standard deviation $\sigma$ and outputs a point $\mu$ which maximizes the expected score of a dart thrown with distribution $\mathcal{N}(\mu, \sigma^2)$.
 
-The authors found that a person with a very small standard deviation (that is, a very skilled player) should aim for the triple 20 (T20), which shouldn't be surprising as it has the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where the optimal location jumps to the T19, before eventually moving towards the center of the board.
+The authors found that a person with a very small standard deviation (that is, a very skilled player) should aim for the triple twenty (T20). That shouldn't be surprising as the T20 is the highest point value on the board. The optimal aiming location stays in the T20 until approximately $\sigma=16.9$mm, where it jumps to the T19, before eventually moving towards the center of the board.
 
 This project compares four different ways to replicate that result.
 
@@ -98,8 +98,6 @@ We should note that basin-hopping is not guaranteed to find the global minimum. 
 
 Figure \ref{fig:basin} shows a visualization for one run of the basin hopping algorithm. Each line represents one pass of the local optimizer, with the dots being the local minima. 
 
-
- \ref{fig:basicheatmap}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{../images/sig19basin.png}
@@ -120,7 +118,7 @@ I reread ``A Statistician Playes Darts''\cite{stat} and realized the authors cam
 
 \section{Method Comparison, Timing, and Final Discussion}\label{sec:timing}
 
-We can sum up the methods for computing in a table:
+Let us summarize the four methods in a table:
 
 \begin{table}[h]
 	\centering
@@ -131,20 +129,22 @@ We can sum up the methods for computing in a table:
 	\end{tabular}
 \end{table}
 
-We can directly compare the speeds of those methods that compute a grid of points, paramaterizing by $n$, the side length of the grid. 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/timing.png}
+	\caption{Speed comparison for the methods I tried. I have omitted basin-hopping as it does not depend on a grid size.}
+	\label{fig:time}
+\end{figure}
 
-None of my homegrown methods for computing \mustar performed better than the convolution algorithm derived by \citeauthor{stat}. I think, however, that it is a valuable example of how a change in overall method can have a much greater impact than optimization within a method. 
+As seen in Figure \ref{fig:time}, none of my home-grown methods for computing $\mu^*$ performed better than the convolution algorithm derived by \citeauthor{stat}.  Not that I exhausted every option. For example, my basin-hopping code uses only direct integration for its function evaluations, but there is no reason why I could not have used Monte-Carlo, which would be significantly faster. My code would also work for distributions other than a bivariate normal, but I did not have time to pursue that.
+
+The shear number of paths I \emph{couldn't} investigate hints at the real value in this project. $F(\mu \vert \sigma)$ is easy to understand but hard to calculate, making it a good test case for a wide variety of global optimization algorithms. It is also a function of two inputs, which lends itself to visuals and real world interpretations like ``moving downhill.'' 
 
 
 
 
 
 
-
-
-
-
-	
 
 \printbibliography
 \end{document}
