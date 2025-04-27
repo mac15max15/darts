@@ -33,7 +33,7 @@ plot_heatmap(heatmap_data_convolve, sigma=sigma, save_fig=False, show=True,title
 find_best_multinormal_center_hopping(
     sigma,
     t=100/sigma,
-    niter_sucess=3,
+    niter_sucess=10,
     filename=bh_filename
 )
 
