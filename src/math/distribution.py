@@ -24,16 +24,17 @@ def main():
 
 def compute_grid_brute(stdev, ev_method, n=300, mn=100):
     """
-    Compute the expected score of a symmetrical distribution over a grid
-    of points
+    Compute the expected score of a darth thrown with a symmetrical distribution over a grid
+    of points using either integration or monte-carlo.
 
     :param stdev: standard deviation
     :param ev_method: method to calculate expected score of the distribution (integration or monte-carlo)
     :param n: side length of the grid
+    :param mn: Number of samples for each function evaluation (for use with monte carlo)
     :return: grid of expected scores
     """
     global monte_carlo_n
-    monte_carlo_n=mn
+    monte_carlo_n = mn
 
     coords = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, n)
     func = np.vectorize(lambda x, y: ev_method(generate_symmetric_distribution(x, y, stdev)))
@@ -41,7 +42,14 @@ def compute_grid_brute(stdev, ev_method, n=300, mn=100):
 
     return func(x, y)
 
-def compute_grid_convolve(stdev, n=100, save_data=False, filename=None):
+def compute_grid_convolve(stdev, n=100):
+    """
+    Compute the expected score of a darth thrown with a symmetrical distribution over a grid
+    of points using a convolution
+    :param stdev: standard deviation
+    :param n: side length of the grid.
+    :return: grid of expected scores
+    """
     dist = generate_symmetric_distribution(0, 0, stdev)
     coords = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, n)
 
@@ -55,13 +63,7 @@ def compute_grid_convolve(stdev, n=100, save_data=False, filename=None):
     pdf_grid /= mass
 
     arr = spi.signal.fftconvolve(score_grid, pdf_grid, mode='same')
-    arr *= dx * dx
-
-    if save_data:
-        if filename:
-            np.save(filename, arr)
-        else:
-            np.save(f'sig{stdev}_{n}pts_{int(time.time())}.npy', arr)
+    arr *= dx * dx  # scale the results by the area of each cell
 
     return arr
 
@@ -72,6 +74,15 @@ def find_best_multinormal_center_hopping(
         niter_sucess=5,
         stepsize=150,
         filename=None):
+    """
+    Compute the optimal place to aim for a symettrical distribution using basin hopping.
+    Write the progress to a file. See the scipy.optimize.basinhopping documentation for
+    what t, niter_sucess, and stepsize to.
+
+    :param stdev: standard deviation
+    :param filename: file name for basin hopping record
+    :return: the optimal point
+    """
 
     if filename:
         global of
@@ -103,7 +114,7 @@ def minimizer_callback(x):
 
 def calculate_dist_ev_monte_carlo(dist):
     """
-    Calculate the expected score from a dart thrown with a given random distribution
+    Calculate the expected score from a single dart thrown with a given random distribution
     by random sampling
     :param dist: distribution
     :param n: number of random samples

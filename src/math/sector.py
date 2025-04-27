@@ -15,48 +15,6 @@ class Sector:
     r_max: float
     val: int
 
-    def get_midpoint(self):
-        r_mean, theta_mean = np.mean([self.r_min, self.r_max]), np.mean([self.theta_min, self.theta_max])
-        return r_mean*np.cos(theta_mean), r_mean*np.sin(theta_mean)
-
-    def get_sector_approx_max(self, pdf, n):
-        """
-        Given a pdf, create an evenly spaced (at least in polar coordinates) n by
-        n grid of points over this sector and evaluate the pdf at each point, then
-        return the maximum value. This is used to optimize integration by ignoring
-        sections with low pdf values.
-        """
-
-        pts = cartesian_product(
-                np.linspace(self.r_min, self.r_max, n),
-                np.linspace(self.theta_min, self.theta_max, n)
-        )
-        return np.max(pdf(ptoc(pts)))
-
-
-def cartesian_product(*arrays):
-    """
-    Does what it says. Copied from:
-    stackoverflow.com/questions/11144513/cartesian-product-of-x-and-y-array-points-into-single-array-of-2d-points
-    """
-    la = len(arrays)
-    dtype = np.result_type(*arrays)
-    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
-    for i, a in enumerate(np.ix_(*arrays)):
-        arr[...,i] = a
-    return arr.reshape(-1, la)
-
-def ptoc(polar_coords):
-    """
-    Convert a list of points in polar coordinates to a list of points in cartesian
-    coordinates. Chatgpt's finest code.
-    """
-    r = polar_coords[:, 0]
-    theta = polar_coords[:, 1]
-    x = r * np.cos(theta)
-    y = r * np.sin(theta)
-    return np.column_stack((x, y))
-
 
 def get_sectors():
     """
@@ -79,8 +37,8 @@ def get_sectors():
 
 def get_score(x, y):
     """
-    Function that takes in an x and y coordinate and returns the score of a
-    dart at that location. Used by the convolution methods.
+    Function that takes in an x and y coordinate and returns the score of the board
+    at that location. Used by the convolution method instead of sectors.
     """
 
     SECTORS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17,
