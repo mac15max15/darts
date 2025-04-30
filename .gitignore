@@ -3,7 +3,6 @@
 **/*.png
 **/*.csv
 presentation/*
-report/*
 *.DS_Store
 **/*.pptx
 
