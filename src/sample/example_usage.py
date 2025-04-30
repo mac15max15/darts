@@ -21,7 +21,7 @@ basin_hopping_filename = '../../basin_data/sample_basin.txt'  # gets overwritten
 
 # integration (I'm using a lower n because it's really slow)
 print('Generating heatmap data by integration...')
-heatmap_data_integrate = compute_grid_brute(sigma, calculate_dist_ev_integration, n=5)
+heatmap_data_integrate = compute_grid_brute(sigma, calculate_dist_ev_integration, n=25)
 plot_heatmap(heatmap_data_integrate,
              sigma=sigma,
              save_fig=True,
@@ -63,7 +63,7 @@ if os.path.exists(basin_hopping_filename):
 print('Running basin-hopping...')
 find_best_multinormal_center_hopping(
     sigma,
-    niter_sucess=3,
+    niter_sucess=10,
     filename=basin_hopping_filename
 )
 

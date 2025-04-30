@@ -41,7 +41,7 @@ def parse_file(filename):
                     x, y = map(float, line[1:-1].split())
                     current_set.append([x, y])
                 except ValueError:
-                    print(f"Skipping invalid line: {line}")
+                    pass
 
             previous_line=line
 
