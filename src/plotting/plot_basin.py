@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 from src.plotting.display import *
 from src.math.constants import *
 
+"""
+This file has the code for plotting a basin hopping run.
+"""
+
 def parse_file(filename):
     """
     Function for parsing the output file from running a basin hopping optimization.
-    Enter at your own risk.
+    Largely written by chatgpt. Enter at your own risk.
     .
     :return: A list of paths, each representing one run of the local optimizer,
     and a list of flags saying whether the result of each path was accepted
@@ -44,6 +48,7 @@ def parse_file(filename):
     return sets, np.array(accepted_flags)
 
 
+# colormap
 def cm(success):
     if success:
         return 'darkgreen'
@@ -51,7 +56,12 @@ def cm(success):
         return 'r'
 
 
-def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=None):
+def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=None, show=False):
+    """
+    Take in a file representing a run of the basin hopping algorithm and plot the results.
+    :param basin_data_path: path to the text file with the basin-hopping data
+    :param heatmap_data_path: path to the .npy file for generating the underlying heatmap (should be the same stdev as used in the basin data)
+    """
 
     fig, ax = generate_dartboard_plot()
     arr = np.load(heatmap_data_path)
@@ -59,11 +69,9 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=
     xs = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
     ys = np.linspace(-DOUB_OUTER-HEATMAP_PAD_MM, DOUB_OUTER+HEATMAP_PAD_MM, len(arr))
 
+    # plotting the heatmap
     max_pt = np.unravel_index(np.argmax(arr), shape=arr.shape, order='F')
-
-    print(f'Basin-hopping estimated mu*: ({xs[max_pt[0]]:.2f}, {ys[max_pt[1]]:.2f}), ')
-
-
+    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
     ax.pcolormesh(
         xs * SCALE_FACTOR, ys * SCALE_FACTOR, arr,
         shading='nearest',
@@ -71,16 +79,15 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=
         cmap=C_MAP
     )
 
-    sets, accepted_flags = parse_file(basin_data_path)
-    ax.scatter(xs[max_pt[0]]*SCALE_FACTOR,ys[max_pt[1]]*SCALE_FACTOR, s=100, color='darkgreen', marker='+', linewidths=1.5)
+    # actual basin hopping stuff
+    local_optimization_runs, accepted_flags = parse_file(basin_data_path)
+    num_func_evals = 0
 
-    n=0
-    for i, s in enumerate(sets):
+    for i, local_optimization_run in enumerate(local_optimization_runs):
+        xs = SCALE_FACTOR*np.array(local_optimization_run[0,:])
+        ys = SCALE_FACTOR*np.array(local_optimization_run[1,:])
 
-        xs = SCALE_FACTOR*np.array(s[0,:])
-        ys = SCALE_FACTOR*np.array(s[1,:])
-
-        n+=len(xs)
+        num_func_evals += len(xs)
 
         ax.plot(xs, ys, linestyle='-', marker=None, c=cm(accepted_flags[i]))
         ax.scatter(xs[-1], ys[-1], s=10, c=cm(accepted_flags[i]))
@@ -89,11 +96,10 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=
     fig.tight_layout()
     if save_fig and filename:
         fig.savefig(f'../../images/{filename}', dpi=800)
-    print(f'# of F(mu|sigma) evaluations: {n}')
-    plt.show()
+    print(f'# of F(mu|sigma) evaluations: {num_func_evals}')
+
+    if show:
+        plt.show()
 
 if __name__ == "__main__":
-    plot_basin_run('/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/basin_hopping_sample2.txt',
-                   '/Users/maxcaragozian/Desktop/MATH 305/Darts/src/sample/heatmap_sample.npy',
-                   save_fig=True,
-                   filename='images/sig19basin.png')
+    pass

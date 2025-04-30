@@ -13,13 +13,7 @@ of = 'output.txt'
 
 
 def main():
-    arr = compute_grid_convolve(10, 300)
-
-    plot_heatmap(arr, fname='s10.png', save_fig=True, sigma=10)
-
-    arr = compute_grid_convolve(30, 300)
-
-    plot_heatmap(arr, fname='s30.png', save_fig=True, sigma=30)
+    pass
 
 
 def compute_grid_brute(stdev, ev_method, n=300, mn=100):
@@ -70,7 +64,7 @@ def compute_grid_convolve(stdev, n=100):
 
 def find_best_multinormal_center_hopping(
         stdev,
-        t=1,
+        t=None,
         niter_sucess=5,
         stepsize=150,
         filename=None):
@@ -83,6 +77,8 @@ def find_best_multinormal_center_hopping(
     :param filename: file name for basin hopping record
     :return: the optimal point
     """
+    if not t:
+        t = 100/stdev
 
     if filename:
         global of
@@ -120,9 +116,9 @@ def calculate_dist_ev_monte_carlo(dist):
     :param n: number of random samples
     :return: expected score
     """
-    func = np.vectorize(get_score)
-    rvs = dist.rvs(monte_carlo_n).transpose()
-    return np.mean(func(rvs[0], rvs[1]))
+    get_score_vectorized = np.vectorize(get_score)
+    samples = dist.rvs(monte_carlo_n).transpose()
+    return np.mean(get_score_vectorized(samples[0], samples[1]))
 
 def calculate_dist_ev_integration(dist):
     """
@@ -132,8 +128,8 @@ def calculate_dist_ev_integration(dist):
     :return: the expected score of the dart
     """
 
-    func = np.vectorize(lambda sec: calculate_sector_ev_integration(sec, dist))
-    return np.sum(func(np.array(get_sectors())))
+    integrate_sector_vectorized = np.vectorize(lambda sec: calculate_sector_ev_integration(sec, dist))
+    return np.sum(integrate_sector_vectorized(np.array(get_sectors())))
 
 
 def calculate_sector_ev_integration(sec: Sector, dist):
@@ -144,9 +140,6 @@ def calculate_sector_ev_integration(sec: Sector, dist):
     :param dist: The distribution to integrate over
     :return: The expected value contributed by sec
     """
-
-    # if sec.get_sector_approx_max(dist.pdf, 3) < SECTOR_PDF_IGNORE_THRESHOLD:
-    #     return 0
 
     return spi.integrate.nquad(
         lambda r, theta: dist.pdf((r * np.cos(theta), r * np.sin(theta))) * sec.val * r,
