@@ -27,7 +27,7 @@ plot_heatmap(heatmap_data_monte_carlo, sigma=sigma, save_fig=False, show=True, t
 plot_heatmap(heatmap_data_convolve, sigma=sigma, save_fig=False, show=True, title='Convolution')
 
 
-# Uncomment to run basin hopping (also will take a while)
+# Uncomment to run basin hopping. This also will take a while. Lower niter_success for a faster run
 '''
 find_best_multinormal_center_hopping(
     sigma,
