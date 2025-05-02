@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ def plot_times(timing_df):
     ax.set_ylim((10**-4, 10**3))
     ax.set_xlabel('N')
     ax.set_title(r'Time to Compute $F(\mu \vert \sigma)$ Over an N$\times$N Grid')
-    fig.savefig('../../images/timing.png', dpi=800)
+    fig.savefig('timing.png', dpi=800)
     plt.show()
 
 

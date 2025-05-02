@@ -2,10 +2,10 @@ import pandas as pd
 import scipy as spi
 import time
 
+
 from src.plotting.display import *
 from src.plotting.heatmap import *
 from src.math.constants import *
-
 
 sectors = get_sectors()
 monte_carlo_n = 100

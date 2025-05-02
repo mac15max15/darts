@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 
 from src.plotting.display import *
@@ -95,7 +96,7 @@ def plot_basin_run(basin_data_path, heatmap_data_path, save_fig=False, filename=
 
     fig.tight_layout()
     if save_fig and filename:
-        fig.savefig(f'../../images/{filename}', dpi=800)
+        fig.savefig(filename, dpi=800)
     print(f'# of F(mu|sigma) evaluations: {num_func_evals}')
 
     if show:

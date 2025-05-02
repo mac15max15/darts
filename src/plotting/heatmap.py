@@ -1,10 +1,11 @@
-from src.math.distribution import *
-from src.math.constants import *
-from src.plotting.display import *
-
+import os
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import time
+
+from src.math.distribution import *
+from src.math.constants import *
+from src.plotting.display import *
 
 
 def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, filename=None, show=True, sigma=0, title=None):
@@ -44,7 +45,6 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, filename=None, sho
         bbox_to_anchor=(1.005, 0., 1, 1),
         bbox_transform=ax.transAxes
     )
-    plt.rcParams['text.usetex'] = True
     ticks = np.arange(np.min(arr), np.max(arr), (np.max(arr) - np.min(arr))//5)
     fig.colorbar(heatmap, cax=cax, label=rf'Expected Score, $F(\mu \vert \sigma = {sigma})$', ticks=ticks)
 
@@ -52,7 +52,7 @@ def plot_heatmap(arr, padding=HEATMAP_PAD_MM, save_fig=False, filename=None, sho
         ax.set_title(title)
 
     if save_fig and filename:
-        fig.savefig(f'../../images/{filename}', dpi=800)
+        fig.savefig(filename, dpi=800)
 
     if show:
         plt.show()
