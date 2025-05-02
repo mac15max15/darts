@@ -21,7 +21,7 @@ basin_hopping_filename = os.path.join('basin_data', 'sample_basin_data.npy')  # 
 
 # integration (I'm using a lower n because it's really slow)
 print('Generating heatmap data by integration...')
-heatmap_data_integrate = compute_grid_brute(sigma, calculate_dist_ev_integration, n=5)
+heatmap_data_integrate = compute_grid_brute(sigma, calculate_dist_ev_integration, n=10)
 plot_heatmap(heatmap_data_integrate,
              sigma=sigma,
              save_fig=True,
